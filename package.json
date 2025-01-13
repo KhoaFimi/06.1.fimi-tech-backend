@@ -18,7 +18,13 @@
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
-		"prepare": "husky"
+		"prepare": "husky",
+		"commitlint": "commitlint --edit",
+		"lint-staged": "lint-staged",
+		"docker:dev": "docker compose --env-file ./.env.development -f docker-compose.dev.yml up -d",
+		"docker:build": "docker build -t fimi_admin_backend .",
+		"docker:dev:config": "docker compose --env-file ./.env.development -f docker-compose.dev.yml config",
+		"docker:dev:remove": "docker compose --env-file ./.env.development -f docker-compose.dev.yml down"
 	},
 	"dependencies": {
 		"@nestjs/common": "^10.4.15",
