@@ -55,7 +55,7 @@ export class ApiConfigService {
 	get apiDocsUrl(): string {
 		const isProd = this.isProduction
 
-		if (!isProd) return 'Api doc not allowed to production'
+		if (isProd) return 'Api doc not allowed to production'
 
 		return `${this.baseUrl}/${this.apiDocsPrefix}`
 	}

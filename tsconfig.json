@@ -21,7 +21,12 @@
 			"@/*": ["./src/*"],
 			"@shared/*": ["./src/shared/*"],
 			"@modules/*": ["./src/modules/*"],
-			"@middlewares/*": ["./src/middlewares/*"]
+			"@middlewares/*": ["./src/middlewares/*"],
+			"@filters/*": ["./src/filters/*"],
+			"@decorators/*": ["./src/decorators/*"],
+			"@constraints/*": ["./src/constraints/*"],
+			"@interceptors/*": ["./src/interceptors/*"],
+			"@configs/*": ["./src/configs/*"]
 		}
 	}
 }
