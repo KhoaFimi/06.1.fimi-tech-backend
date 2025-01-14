@@ -1,6 +1,7 @@
 import { GlobalExceptionFilter } from '@filters/global-exception.filter'
 import { ResponseInterceptor } from '@interceptors/response.interceptor'
 import { HttpLoggingMiddleware } from '@middlewares/http-logging.middleware.middleware'
+import { PlatformsModule } from '@modules/platforms/platforms.module'
 import { UsersModule } from '@modules/users/users.module'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
@@ -9,7 +10,7 @@ import { SharedModule } from '@shared/shared.module'
 import { AppController } from '@/app.controller'
 
 @Module({
-	imports: [SharedModule, UsersModule],
+	imports: [SharedModule, UsersModule, PlatformsModule],
 	controllers: [AppController],
 	providers: [
 		{
