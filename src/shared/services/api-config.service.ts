@@ -71,6 +71,54 @@ export class ApiConfigService {
 	}
 	// #endregion
 
+	// #region: database config
+	get databaseUrl(): string {
+		return this.getString('DATABASE_URL')
+	}
+
+	get databaseName(): string {
+		return this.getString('MONGO_INITDB_DATABASE')
+	}
+	// #endregion
+
+	// #region: google config
+	get googleClientId(): string {
+		return this.getString('GOOGLE_CLIENT_ID')
+	}
+
+	get googleClientSecret(): string {
+		return this.getString('GOOGLE_CLIENT_SECRET')
+	}
+
+	get googleRefreshToken(): string {
+		return this.getString('GOOGLE_REFRESH_TOKEN')
+	}
+
+	get adminEmailAddress(): string {
+		return this.getString('GOOGLE_REFRESH_TOKEN')
+	}
+	// #endregion
+
+	// #region: jwt config
+	get accessTokenExpires(): string {
+		return this.getString('ACCESS_TOKEN_EXPIRES')
+	}
+
+	get refreshTokenExpires(): number {
+		return this.getNumber('REFRESH_TOKEN_EXPIRES')
+	}
+	// #endregion
+
+	// #region: token config
+	get verificationTokenExpires(): number {
+		return this.getNumber('VERIFICATION_TOKEN_EXPIRES')
+	}
+
+	get resetPasswordTokenExpires(): number {
+		return this.getNumber('RESET_PASSWORD_TOKEN_EXPIRES')
+	}
+	// #endregion
+
 	// #region: get method
 	private getNumber(key: string): number {
 		const value = this.get(key)
