@@ -1,8 +1,10 @@
+import { apiDocsConfig } from '@configs/api-docs.config'
+import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { ApiConfigService } from '@shared/services/api-config.service'
+import { LoggerService } from '@shared/services/logger.service'
 
 import { AppModule } from '@/app.module'
-import { LoggerService } from '@/shared/services/logger.service'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
@@ -20,6 +22,10 @@ async function bootstrap() {
 	const logger = app.get(LoggerService)
 
 	app.setGlobalPrefix(apiConfig.apiPrefix)
+
+	app.useGlobalPipes(new ValidationPipe())
+
+	apiDocsConfig(app, apiConfig.apiDocsPrefix)
 
 	await app.listen(apiConfig.port)
 
