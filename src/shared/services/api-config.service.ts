@@ -10,6 +10,10 @@ export class ApiConfigService {
 		return this.getString('NODE_ENV')
 	}
 
+	get appType(): string {
+		return this.getString('API_TYPE')
+	}
+
 	get isDevelopment(): boolean {
 		return this.nodeEnv === 'development'
 	}
@@ -20,6 +24,10 @@ export class ApiConfigService {
 
 	get isTest(): boolean {
 		return this.nodeEnv === 'test'
+	}
+
+	get isUat(): boolean {
+		return this.appType === 'uat'
 	}
 
 	get apiPrefix(): string {
@@ -57,7 +65,9 @@ export class ApiConfigService {
 
 		if (isProd) return 'Api doc not allowed to production'
 
-		return `${this.baseUrl}/${this.apiDocsPrefix}`
+		return this.isUat
+			? `https://uat-be.fimi.tech/${this.apiDocsPrefix}`
+			: `${this.baseUrl}/${this.apiDocsPrefix}`
 	}
 	// #endregion
 
@@ -95,7 +105,7 @@ export class ApiConfigService {
 	}
 
 	get adminEmailAddress(): string {
-		return this.getString('GOOGLE_REFRESH_TOKEN')
+		return this.getString('ADMIN_EMAIL_ADDRESS')
 	}
 	// #endregion
 
@@ -104,8 +114,8 @@ export class ApiConfigService {
 		return this.getString('ACCESS_TOKEN_EXPIRES')
 	}
 
-	get refreshTokenExpires(): number {
-		return this.getNumber('REFRESH_TOKEN_EXPIRES')
+	get refreshTokenExpires(): string {
+		return this.getString('REFRESH_TOKEN_EXPIRES')
 	}
 	// #endregion
 

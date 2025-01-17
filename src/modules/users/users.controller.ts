@@ -1,43 +1,27 @@
-import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Patch,
-	Post
-} from '@nestjs/common'
+import { Controller, Get, Req, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiSecurity } from '@nestjs/swagger'
+import { plainToClass } from 'class-transformer'
 
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { UsersService } from './users.service'
+import { SuccessCode } from '@/constraints/code.constraints'
+import { ResponseBody } from '@/decorators/response-message.decorator'
+import { AccessTokenGuard } from '@/guards/access-token.guard'
+import { User } from '@/modules/users/entities/user.entity'
+import { ExtendedRequest } from '@/types/api.type'
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
-
-	@Post()
-	create(@Body() createUserDto: CreateUserDto) {
-		return this.usersService.create(createUserDto)
-	}
-
-	@Get()
-	findAll() {
-		return this.usersService.findAll()
-	}
-
-	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.usersService.findOne(+id)
-	}
-
-	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-		return this.usersService.update(+id, updateUserDto)
-	}
-
-	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.usersService.remove(+id)
+	@Get('/me')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Lấy thông tin người dùng thành công'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async me(@Req() request: ExtendedRequest) {
+		return {
+			user: plainToClass(User, request.user)
+		}
 	}
 }

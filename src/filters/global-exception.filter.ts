@@ -4,9 +4,10 @@ import {
 	ExceptionFilter,
 	HttpException
 } from '@nestjs/common'
-import { ApiConfigService } from '@shared/services/api-config.service'
 import { Response } from 'express'
 
+import { ErrorCode } from '@/constraints/code.constraints'
+import { ApiConfigService } from '@/shared/services/api-config.service'
 import { ResponseType } from '@/types/common.type'
 
 @Catch()
@@ -26,14 +27,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				? exception.message
 				: 'Internal server error'
 
+		console.log(exception.cause)
+
 		response.status(status).json({
-			statusCode: exception.response.statusCode,
+			statusCode: exception.error ?? ErrorCode.INTERNAL_SERVER_ERROR,
 			message,
-			error: this.apiConfig.isDevelopment
-				? {
-						stack: exception.stack
-					}
-				: null
+			error: {
+				...exception.cause,
+				stack: !this.apiConfig.isUat ? exception.stack : null
+			}
 		})
 	}
 }
