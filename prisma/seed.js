@@ -1,10 +1,11 @@
-import { PrismaClient } from '@prisma/client'
-import argon2 from 'argon2'
+const argon2 = require('argon2')
+
+const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
 const main = async () => {
-	const seedPlatform = await prisma.platform.create({
+	const seedPlatform = await prisma.partner.create({
 		data: {
 			code: 'FIMI',
 			apiKey: await argon2.hash('b8a66f7d-381e-47f8-afea-83c8b0a1fd3b'),
@@ -14,21 +15,21 @@ const main = async () => {
 		}
 	})
 
-	const sheetCategory = await prisma.category.createMany({
-		data: [
-			{
-				name: 'Thẻ tín dụng'
-			},
-			{
-				name: 'Tài khoản thanh toán'
-			},
-			{
-				name: 'Vay tín chấp'
-			}
-		]
-	})
+	// const sheetCategory = await prisma.category.createMany({
+	// 	data: [
+	// 		{
+	// 			name: 'Thẻ tín dụng'
+	// 		},
+	// 		{
+	// 			name: 'Tài khoản thanh toán'
+	// 		},
+	// 		{
+	// 			name: 'Vay tín chấp'
+	// 		}
+	// 	]
+	// })
 
-	console.log({ seedPlatform, sheetCategory })
+	console.log({ seedPlatform })
 }
 
 main()

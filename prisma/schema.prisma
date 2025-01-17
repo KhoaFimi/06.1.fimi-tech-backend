@@ -13,30 +13,35 @@ enum GENDER {
   FEMALE
 }
 
+enum ROLES {
+  PARTNER_ADMIN
+  PUBLISHER
+}
+
 // #endregion
 
 // #region:User
 model User {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  code          String        @unique @map("pub_code")
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  code          String    @unique @map("pub_code")
   fullname      String
-  phone         String        @unique
-  email         String        @unique
-  emailVerified DateTime?     @map("email_verified")
-  level         Int           @default(0)
-  password      String        @unique
-  document      Docuemnt?
+  phone         String    @unique
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  password      String    @unique
+  roles         ROLES     @default(PUBLISHER)
+  document      Document?
   profile       Profile?
-  tnc           Boolean       @default(false)
-  platformId    String        @db.ObjectId
-  platform      Platform      @relation(fields: [platformId], references: [id])
-  managerId     String?       @db.ObjectId
-  manager       User?         @relation("manage", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  manage        User[]        @relation("manage")
-  createdAt     DateTime      @default(now())
-  isDelete      Boolean       @default(false)
-  updatedAt     DateTime      @updatedAt
-  refreshToken  RefreshToken?
+  tnc           Boolean   @default(false)
+  partnerId     String    @db.ObjectId
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+  managerId     String?   @db.ObjectId
+  manager       User?     @relation("manage", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manage        User[]    @relation("manage")
+  createdAt     DateTime  @default(now())
+  isDelete      Boolean   @default(false)
+  updatedAt     DateTime  @updatedAt
+  refreshToken  String?
 
   @@map("user")
 }
@@ -64,7 +69,7 @@ type Bank {
   name          String
 }
 
-type Docuemnt {
+type Document {
   citizenIdentification String   @map("citizen_identification")
   dateOfIssue           DateTime @map("date_of_issue")
   placeOfIssue          DateTime @map("place_of_issue")
@@ -76,8 +81,8 @@ type Docuemnt {
 
 // #endregion
 
-// #region: Platform
-model Platform {
+// #region: Partner
+model Partner {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   code       String      @unique
   publsihers User[]
@@ -87,7 +92,7 @@ model Platform {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  @@map("platforms")
+  @@map("partners")
 }
 
 type PricePolicy {
@@ -115,16 +120,6 @@ model ResetPasswordToken {
   token      String   @unique
 
   @@map("reset_password_tokens")
-}
-
-model RefreshToken {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifierId String   @unique @db.ObjectId
-  user         User     @relation(references: [id], fields: [identifierId], onDelete: Cascade)
-  expires      DateTime
-  token        String?  @unique
-
-  @@map("refresh_tokens")
 }
 
 // #endregion

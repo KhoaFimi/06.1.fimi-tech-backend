@@ -1,16 +1,30 @@
-import { GlobalExceptionFilter } from '@filters/global-exception.filter'
-import { ResponseInterceptor } from '@interceptors/response.interceptor'
-import { HttpLoggingMiddleware } from '@middlewares/http-logging.middleware.middleware'
-import { PlatformsModule } from '@modules/platforms/platforms.module'
-import { UsersModule } from '@modules/users/users.module'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
-import { SharedModule } from '@shared/shared.module'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 import { AppController } from '@/app.controller'
+import { GlobalExceptionFilter } from '@/filters/global-exception.filter'
+import { ResponseInterceptor } from '@/interceptors/response.interceptor'
+import { HttpLoggingMiddleware } from '@/middlewares/http-logging.middleware.middleware'
+import { AccountsModule } from '@/modules/accounts/accounts.module'
+import { AuthModule } from '@/modules/auth/auth.module'
+import { PartnersModule } from '@/modules/partners/partners.module'
+import { QueuesModule } from '@/modules/queues/queues.module'
+import { TokensModule } from '@/modules/tokens/tokens.module'
+import { UsersModule } from '@/modules/users/users.module'
+import { SharedModule } from '@/shared/shared.module'
 
 @Module({
-	imports: [SharedModule, UsersModule, PlatformsModule],
+	imports: [
+		EventEmitterModule.forRoot(),
+		SharedModule,
+		UsersModule,
+		PartnersModule,
+		AuthModule,
+		TokensModule,
+		AccountsModule,
+		QueuesModule
+	],
 	controllers: [AppController],
 	providers: [
 		{

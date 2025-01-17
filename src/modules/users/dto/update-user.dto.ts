@@ -1,5 +1,3 @@
-import { PartialType } from '@nestjs/mapped-types'
+import { Prisma } from '@prisma/client'
 
-import { CreateUserDto } from '@/modules/users/dto/create-user.dto'
-
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export type UpdateUserDto = Prisma.UserUpdateInput

@@ -22,13 +22,13 @@ export const checkExistSercureFolder = () => {
 }
 
 const accessTokenKeyPairPaths = {
-	private: path.join(process.cwd(), SECURE_PATH),
-	public: path.join(process.cwd(), SECURE_PATH)
+	private: path.join(process.cwd(), SECURE_PATH, 'access-token-private.key'),
+	public: path.join(process.cwd(), SECURE_PATH, 'access-token-public.key')
 } satisfies ITokenKeyPairPaths
 
 const refreshTokenKeyPairPaths = {
-	private: path.join(process.cwd(), SECURE_PATH),
-	public: path.join(process.cwd(), SECURE_PATH)
+	private: path.join(process.cwd(), SECURE_PATH, 'refresh-token-private.key'),
+	public: path.join(process.cwd(), SECURE_PATH, 'refresh-token-public.key')
 } satisfies ITokenKeyPairPaths
 
 const generateKeyPair = (paths: ITokenKeyPairPaths): ITokenKeyPair => {
@@ -57,6 +57,7 @@ const generateKeyPair = (paths: ITokenKeyPairPaths): ITokenKeyPair => {
 	})
 
 	fs.writeFileSync(paths.private, privateKey)
+	fs.writeFileSync(paths.public, publicKey)
 
 	return {
 		privateKey,

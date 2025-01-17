@@ -15,5 +15,6 @@ export enum ErrorCode {
 	UNAUTHORIZED_ERROR = 'E4000',
 	NOT_FOUND_ERROR = 'E4040', // Not found error
 	WRONG_CREDENTIALS_ERROR = 'E4041', // Credentials is wrong
-	DUPLICATED_ERROR = 'E4091' // Duplicated record
+	DUPLICATED_ERROR = 'E4091', // Duplicated record
+	INTERNAL_SERVER_ERROR = 'E5000'
 }

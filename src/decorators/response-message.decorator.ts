@@ -1,5 +1,6 @@
-import { ErrorCode, SuccessCode } from '@constraints/code.constraints'
 import { SetMetadata } from '@nestjs/common'
+
+import { ErrorCode, SuccessCode } from '@/constraints/code.constraints'
 
 export interface IResponseBody {
 	statusCode: SuccessCode | ErrorCode
