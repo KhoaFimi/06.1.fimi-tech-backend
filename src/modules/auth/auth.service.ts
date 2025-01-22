@@ -6,7 +6,6 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { ROLES } from '@prisma/client'
 import * as argon2 from 'argon2'
 
 import { ErrorCode, SuccessCode } from '@/constraints/code.constraints'
@@ -16,8 +15,6 @@ import { PartnersService } from '@/modules/partners/partners.service'
 import { SendOtpDto } from '@/modules/queues/dtos/send-otp.dto'
 import { AccessTokenService } from '@/modules/tokens/services/access-token.service'
 import { RefreshTokenService } from '@/modules/tokens/services/refresh-token.service'
-import { ResetPasswordTokenService } from '@/modules/tokens/services/reset-password-token.service'
-import { VerificationTokenService } from '@/modules/tokens/services/verification-token.service'
 import { UsersService } from '@/modules/users/users.service'
 
 @Injectable()
@@ -25,9 +22,7 @@ export class AuthService {
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly partnersService: PartnersService,
-		private readonly verificationTokenService: VerificationTokenService,
 		private readonly accessTokenService: AccessTokenService,
-		private readonly resetPasswordTokenService: ResetPasswordTokenService,
 		private readonly refreshTokenService: RefreshTokenService,
 		private readonly eventEmiter: EventEmitter2
 	) {}
@@ -208,7 +203,7 @@ export class AuthService {
 		})
 	}
 
-	public async genTokenPair(id: string, roles: ROLES) {
+	public async genTokenPair(id: string, roles: number) {
 		const { accessToken } = await this.accessTokenService.generate({
 			sub: id,
 			roles

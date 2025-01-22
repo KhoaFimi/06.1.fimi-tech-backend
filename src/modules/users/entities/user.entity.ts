@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-	Document,
-	Partner,
-	Profile,
-	ROLES,
-	User as UserModel
-} from '@prisma/client'
+import { Document, Partner, Profile, User as UserModel } from '@prisma/client'
 import { Exclude } from 'class-transformer'
 
 export class User {
@@ -55,5 +49,5 @@ export class User {
 	@Exclude()
 	refreshToken: string
 
-	roles: ROLES
+	roles: number
 }

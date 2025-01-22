@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 
-import { CreateUserDto } from '@/modules/users/dto/create-user.dto'
-import { FindAllUserDto } from '@/modules/users/dto/find-all-user.dto'
+import { CreateUserDto } from '@/modules/users/dtos/create-user.dto'
+import { FindAllUserDto } from '@/modules/users/dtos/find-all-user.dto'
 import {
 	FindUniqueUserDto,
 	FindUserByDto,
 	FindUserDto
-} from '@/modules/users/dto/find-user.dto'
-import { UpdateUserDto } from '@/modules/users/dto/update-user.dto'
+} from '@/modules/users/dtos/find-user.dto'
+import { UpdateUserDto } from '@/modules/users/dtos/update-user.dto'
 import { PrismaService } from '@/shared/services/prisma.service'
 import { FindAllParams } from '@/types/common.type'
 

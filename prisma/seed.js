@@ -1,35 +1,35 @@
-const argon2 = require('argon2')
+// const argon2 = require('argon2')
 
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
 const main = async () => {
-	const seedPlatform = await prisma.partner.create({
-		data: {
-			code: 'FIMI',
-			apiKey: await argon2.hash('b8a66f7d-381e-47f8-afea-83c8b0a1fd3b'),
-			prize: {
-				origin: 0.95
-			}
-		}
-	})
-
-	// const sheetCategory = await prisma.category.createMany({
-	// 	data: [
-	// 		{
-	// 			name: 'Thẻ tín dụng'
-	// 		},
-	// 		{
-	// 			name: 'Tài khoản thanh toán'
-	// 		},
-	// 		{
-	// 			name: 'Vay tín chấp'
+	// const seedPlatform = await prisma.partner.create({
+	// 	data: {
+	// 		code: 'FIMI',
+	// 		apiKey: await argon2.hash('b8a66f7d-381e-47f8-afea-83c8b0a1fd3b'),
+	// 		prize: {
+	// 			origin: 0.95
 	// 		}
-	// 	]
+	// 	}
 	// })
 
-	console.log({ seedPlatform })
+	const seedCategory = await prisma.category.createMany({
+		data: [
+			{
+				name: 'Thẻ tín dụng'
+			},
+			{
+				name: 'Tài khoản thanh toán'
+			},
+			{
+				name: 'Vay tín chấp'
+			}
+		]
+	})
+
+	console.log({ seedCategory })
 }
 
 main()

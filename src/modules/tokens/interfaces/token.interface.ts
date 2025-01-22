@@ -1,8 +1,6 @@
-import { ROLES } from '@prisma/client'
-
 export interface IAccessTokenPayload {
 	sub: string
-	roles: ROLES
+	roles: number
 }
 
 export interface IRefreshTokenPayload {

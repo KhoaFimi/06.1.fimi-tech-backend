@@ -8,6 +8,8 @@ import { ResponseInterceptor } from '@/interceptors/response.interceptor'
 import { HttpLoggingMiddleware } from '@/middlewares/http-logging.middleware.middleware'
 import { AccountsModule } from '@/modules/accounts/accounts.module'
 import { AuthModule } from '@/modules/auth/auth.module'
+import { CampaignsModule } from '@/modules/campaigns/campaigns.module'
+import { CategoriesModule } from '@/modules/categories/categories.module'
 import { PartnersModule } from '@/modules/partners/partners.module'
 import { QueuesModule } from '@/modules/queues/queues.module'
 import { TokensModule } from '@/modules/tokens/tokens.module'
@@ -23,7 +25,9 @@ import { SharedModule } from '@/shared/shared.module'
 		AuthModule,
 		TokensModule,
 		AccountsModule,
-		QueuesModule
+		QueuesModule,
+		CampaignsModule,
+		CategoriesModule
 	],
 	controllers: [AppController],
 	providers: [
