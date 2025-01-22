@@ -31,7 +31,11 @@ export class ApiDocsService {
 
 			const docuement = SwaggerModule.createDocument(app, config)
 
-			SwaggerModule.setup(this.apiConfig.apiDocsPrefix, app, docuement)
+			SwaggerModule.setup(this.apiConfig.apiDocsPrefix, app, docuement, {
+				swaggerOptions: {
+					persistAuthorization: true
+				}
+			})
 
 			return {
 				message: `Api doc starting at: ${this.apiConfig.apiDocsUrl}`

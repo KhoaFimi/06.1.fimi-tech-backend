@@ -129,6 +129,24 @@ export class ApiConfigService {
 	}
 	// #endregion
 
+	// #region: clodinary config
+	get cloudinaryApiKey(): string {
+		return this.getString('CLOUDINARY_API_KEY')
+	}
+
+	get cloudinaryApiSecret(): string {
+		return this.getString('CLOUDINARY_API_SECRET')
+	}
+
+	get cloudinaryCloudName(): string {
+		return this.getString('CLOUDINARY_CLOUD_NAME')
+	}
+
+	get cloudinaryUrl(): string {
+		return this.getString('CLOUDINARY_URL')
+	}
+	// #endregion
+
 	// #region: get method
 	private getNumber(key: string): number {
 		const value = this.get(key)

@@ -19,19 +19,30 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
 		const response = ctx.getResponse<Response<ResponseType>>()
 
-		const status =
-			exception instanceof HttpException ? exception.getStatus() : 500
+		if (exception instanceof HttpException) {
+			const status = exception.getStatus() ?? 500
 
-		const message =
-			exception instanceof HttpException
-				? exception.message
-				: 'Internal server error'
+			const message = exception.message ?? 'Internal server error'
 
-		console.log(exception.cause)
+			const exRes = exception.getResponse() as {
+				message: string
+				error: string
+				statusCode: number
+			}
 
-		response.status(status).json({
-			statusCode: exception.error ?? ErrorCode.INTERNAL_SERVER_ERROR,
-			message,
+			return response.status(status).json({
+				statusCode: exRes.error ?? ErrorCode.INTERNAL_SERVER_ERROR,
+				message,
+				error: {
+					...(exception.cause as object),
+					stack: !this.apiConfig.isUat ? exception.stack : null
+				}
+			})
+		}
+
+		response.status(500).json({
+			statusCode: ErrorCode.INTERNAL_SERVER_ERROR,
+			message: 'Internal server error',
 			error: {
 				...exception.cause,
 				stack: !this.apiConfig.isUat ? exception.stack : null
