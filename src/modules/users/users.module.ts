@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common'
 
 import { TokensModule } from '@/modules/tokens/tokens.module'
+import { UsersController } from '@/modules/users/users.controller'
+import { UsersService } from '@/modules/users/users.service'
 import { SharedModule } from '@/shared/shared.module'
 
-import { UsersController } from './users.controller'
-import { UsersService } from './users.service'
-
 @Module({
-	imports: [TokensModule, SharedModule],
+	imports: [SharedModule, TokensModule],
 	controllers: [UsersController],
 	providers: [UsersService],
 	exports: [UsersService]

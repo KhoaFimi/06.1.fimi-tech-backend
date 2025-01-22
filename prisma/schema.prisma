@@ -53,33 +53,33 @@ type Profile {
   dateOfBirth    DateTime? @map("date_of_birth")
   placeOfBirth   String?   @map("place_of_birth")
   gender         GENDER?
-  avatar         String?
-  workAt         String    @map("work_at")
+  avatar         Image?
+  workAt         String?   @map("work_at")
   currentAddress Address?
   bank           Bank?
 }
 
 type Address {
-  detail   String
-  ward     String
-  district String
-  province String
+  detail   String?
+  ward     String?
+  district String?
+  province String?
 }
 
 type Bank {
-  accountName   String @map("account_name")
-  accountNumber String @map("account_number")
-  name          String
+  accountName   String? @map("account_name")
+  accountNumber String? @map("account_number")
+  name          String?
 }
 
 type Document {
-  citizenIdentification String   @map("citizen_identification")
-  dateOfIssue           DateTime @map("date_of_issue")
-  placeOfIssue          DateTime @map("place_of_issue")
-  imageFront            String?  @map("image_front")
-  imageBack             String?  @map("image_back")
-  potrait               String?
-  spec                  Json
+  citizenIdentification String?   @map("citizen_identification")
+  dateOfIssue           DateTime? @map("date_of_issue")
+  placeOfIssue          DateTime? @map("place_of_issue")
+  imageFront            Image?    @map("image_front")
+  imageBack             Image?    @map("image_back")
+  potrait               Image?
+  spec                  Json?
 }
 
 // #endregion

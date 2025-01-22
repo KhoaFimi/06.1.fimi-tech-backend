@@ -5,7 +5,7 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import * as argon2 from 'argon2'
 
 import { ErrorCode, SuccessCode } from '@/constraints/code.constraints'
@@ -188,6 +188,7 @@ export class AuthService {
 		return res
 	}
 
+	@OnEvent('logout')
 	public async signOut(id: string) {
 		const existingUser = await this.usersService.findOneByUnique({
 			id
