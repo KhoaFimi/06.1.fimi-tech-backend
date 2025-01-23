@@ -1,13 +1,37 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
-import { ApiBody, ApiParam, ApiSecurity, ApiTags } from '@nestjs/swagger'
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Put,
+	UseGuards
+} from '@nestjs/common'
+import {
+	ApiBearerAuth,
+	ApiBody,
+	ApiParam,
+	ApiSecurity,
+	ApiTags
+} from '@nestjs/swagger'
+import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
+import { AccessTokenGuard } from '@/guards/access-token.guard'
 import { VerifyPartnerGuard } from '@/guards/verify-partner.guard'
 import { AccountsService } from '@/modules/accounts/accounts.service'
+import {
+	ChangeEmaiDto,
+	RequestChangeEmailDto
+} from '@/modules/accounts/dtos/change-email.dto'
+import { ChangePasswordDto } from '@/modules/accounts/dtos/change-password.dto'
+import { ChangeUserPhoneDto } from '@/modules/accounts/dtos/change-user-phone.dto'
 import { ForgotPasswordDto } from '@/modules/accounts/dtos/forgot-password.dto'
 import { NewVerificationDto } from '@/modules/accounts/dtos/new-verification.dto'
 import { ResetPasswordDto } from '@/modules/accounts/dtos/reset-password.dto'
+import { UpdateUserInfoDto } from '@/modules/accounts/dtos/update-user-info.dto'
+import { User } from '@/modules/users/entities/user.entity'
 
 @Controller('accounts')
 @ApiTags('Account')
@@ -83,6 +107,104 @@ export class AccountsController {
 		const res = await this.accountsService.resetPassword(body)
 
 		return res
+	}
+	// #endregion
+
+	// #region: Update user data
+	@Put('/update-info/:id')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Cập nhật thông tin người dùng thành công'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async UpdateUser(
+		@Param('id') id: string,
+		@Body() updateUserDto: UpdateUserInfoDto
+	) {
+		const res = await this.accountsService.changeInfo(id, updateUserDto)
+
+		return {
+			user: plainToClass(User, res)
+		}
+	}
+	// #endregion
+
+	// #region: Change password
+	@Put('/change-password/:id')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thay đổi mật khẩu thành công, yêu cầu đăng nhập lại'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async ChangePassword(
+		@Param('id') id: string,
+		@Body() body: ChangePasswordDto
+	) {
+		await this.accountsService.changePassword(id, body)
+	}
+	// #endregion
+
+	// #region: Change phone number
+	@Put('/change-phone/:id')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thay đổi số điện thoại thành công.'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async ChangePhone(@Param('id') id: string, @Body() body: ChangeUserPhoneDto) {
+		const res = await this.accountsService.changePhone(id, body)
+
+		return {
+			user: plainToClass(User, res)
+		}
+	}
+	// #endregion
+
+	// #region: Request change email
+	@Post('/request-change-email/:id')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Yêu cầu thay đổi email thành công.'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async RequestChangeEmail(
+		@Param('id') id: string,
+		@Body() body: RequestChangeEmailDto
+	) {
+		const res = await this.accountsService.requestChangeEmail(id, body)
+
+		return res
+	}
+	// #endregion
+
+	// #region: Change email
+	@Post('/change-email')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thay đổi email thành công.'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async ChangeEmail(@Body() body: ChangeEmaiDto) {
+		const res = await this.accountsService.changeEmail(body)
+
+		return {
+			user: plainToClass(User, res)
+		}
 	}
 	// #endregion
 }

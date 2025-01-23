@@ -127,6 +127,10 @@ export class ApiConfigService {
 	get resetPasswordTokenExpires(): number {
 		return this.getNumber('RESET_PASSWORD_TOKEN_EXPIRES')
 	}
+
+	get changeEmailTokenExpires(): number {
+		return this.getNumber('CHANGE_EMAIL_TOKEN_EXPIRES')
+	}
 	// #endregion
 
 	// #region: clodinary config

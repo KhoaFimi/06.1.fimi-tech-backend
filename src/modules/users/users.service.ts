@@ -1,13 +1,5 @@
-import {
-	BadRequestException,
-	Injectable,
-	NotFoundException
-} from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
-import * as argon2 from 'argon2'
+import { Injectable } from '@nestjs/common'
 
-import { ErrorCode } from '@/constraints/code.constraints'
-import { ChangePasswordDto } from '@/modules/users/dtos/change-password.dto'
 import { CreateUserDto } from '@/modules/users/dtos/create-user.dto'
 import { FindAllUserDto } from '@/modules/users/dtos/find-all-user.dto'
 import {
@@ -21,10 +13,7 @@ import { FindAllParams } from '@/types/common.type'
 
 @Injectable()
 export class UsersService {
-	constructor(
-		private readonly db: PrismaService,
-		private readonly eventEmiter: EventEmitter2
-	) {}
+	constructor(private readonly db: PrismaService) {}
 
 	async create(createUserDto: CreateUserDto) {
 		return await this.db.user.create({
@@ -96,49 +85,5 @@ export class UsersService {
 		return this.db.user.delete({
 			where: { id }
 		})
-	}
-
-	async checkExistingUser(id: string) {
-		const existinngUser = await this.findOneById(id)
-
-		if (!existinngUser)
-			throw new NotFoundException('Không tìm thấy người dùng tương ứng', {
-				description: ErrorCode.NOT_FOUND_ERROR,
-				cause: {
-					validationError: [{ field: 'id', detail: 'Id không chính xác' }]
-				}
-			})
-
-		return existinngUser
-	}
-
-	async changePassword(id: string, changePasswordDto: ChangePasswordDto) {
-		const existingUser = await this.checkExistingUser(id)
-
-		const verifyOldPassword = await argon2.verify(
-			existingUser.password,
-			changePasswordDto.oldPassword
-		)
-
-		if (!verifyOldPassword)
-			throw new BadRequestException('Mật khẩu không chính xác', {
-				description: ErrorCode.WRONG_CREDENTIALS_ERROR,
-				cause: {
-					validationError: [
-						{
-							field: 'oldPassword',
-							detail: 'Mật khẩu hiện tại không chính xác'
-						}
-					]
-				}
-			})
-
-		const hashedNewPassword = await argon2.hash(changePasswordDto.newPassword)
-
-		await this.update(id, {
-			password: hashedNewPassword
-		})
-
-		this.eventEmiter.emit('logout', id)
 	}
 }

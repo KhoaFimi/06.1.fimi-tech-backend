@@ -43,6 +43,18 @@ export class QueuesService {
 		)
 	}
 
+	@OnEvent('send.change-email-otp')
+	async addSendChangeEmailOtpQueue(payload: SendOtpDto) {
+		await this.otpQueue.add(
+			'change-email',
+			{
+				id: payload.id,
+				email: payload.email
+			},
+			{ removeOnComplete: true }
+		)
+	}
+
 	@OnEvent('add.campaign-media')
 	async addCampaignMediaQueue(payload: AddCampaignMediaDto) {
 		await this.campaignQueue.add('upload-campaign-image', {

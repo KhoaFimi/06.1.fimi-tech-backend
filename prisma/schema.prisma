@@ -106,7 +106,7 @@ type PricePolicy {
 
 // #endregion
 
-// #region: Tolken
+// #region: Token
 model VerificationToken {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
@@ -123,6 +123,16 @@ model ResetPasswordToken {
   token      String   @unique
 
   @@map("reset_password_tokens")
+}
+
+model ChangeEmailToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  newEmail   String
+  expires    DateTime
+  token      String   @unique
+
+  @@map("reset_email_tokens")
 }
 
 // #endregion
