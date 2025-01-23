@@ -207,4 +207,8 @@ export class AccountsController {
 		}
 	}
 	// #endregion
+
+	// #region: Change avatar
+
+	// #endregion
 }

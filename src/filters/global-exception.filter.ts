@@ -35,7 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				message,
 				error: {
 					...(exception.cause as object),
-					stack: !this.apiConfig.isUat ? exception.stack : null
+					stack: exception.stack
 				}
 			})
 		}
@@ -45,7 +45,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			message: 'Internal server error',
 			error: {
 				...exception.cause,
-				stack: !this.apiConfig.isUat ? exception.stack : null
+				stack: exception.stack
 			}
 		})
 	}
