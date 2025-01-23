@@ -19,6 +19,7 @@ import { NewVerificationDto } from '@/modules/accounts/dtos/new-verification.dto
 import { ResetPasswordDto } from '@/modules/accounts/dtos/reset-password.dto'
 import { UpdateUserInfoDto } from '@/modules/accounts/dtos/update-user-info.dto'
 import { SendOtpDto } from '@/modules/queues/dtos/send-otp.dto'
+import { UploadUserAvatarDto } from '@/modules/queues/dtos/upload-user-media.dto'
 import { ChangeEmailTokenService } from '@/modules/tokens/services/change-email-token.service'
 import { ResetPasswordTokenService } from '@/modules/tokens/services/reset-password-token.service'
 import { VerificationTokenService } from '@/modules/tokens/services/verification-token.service'
@@ -251,5 +252,17 @@ export class AccountsService {
 		})
 
 		return res
+	}
+
+	async changeAvatar(id: string, avatar: Express.Multer.File) {
+		const existingUser = await this.checkExistingUser(id)
+
+		await this.eventEmiter.emit(
+			'add.user-avatar',
+			new UploadUserAvatarDto({
+				id: existingUser.id,
+				avatar: avatar
+			})
+		)
 	}
 }

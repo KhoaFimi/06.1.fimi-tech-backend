@@ -5,10 +5,12 @@ import { Queue } from 'bullmq'
 
 import {
 	ADD_CAMPAIGN_MEDIA_QUEUE_NAME,
-	OTP_QUEUE_NAME
+	OTP_QUEUE_NAME,
+	UPLOAD_USER_MEDIA_QUEUE_NAME
 } from '@/constants/queue.constant'
 import { AddCampaignMediaDto } from '@/modules/queues/dtos/add-campaign-media.dto'
 import { SendOtpDto } from '@/modules/queues/dtos/send-otp.dto'
+import { UploadUserAvatarDto } from '@/modules/queues/dtos/upload-user-media.dto'
 
 @Injectable()
 export class QueuesService {
@@ -16,7 +18,9 @@ export class QueuesService {
 		@InjectQueue(OTP_QUEUE_NAME)
 		private readonly otpQueue: Queue,
 		@InjectQueue(ADD_CAMPAIGN_MEDIA_QUEUE_NAME)
-		private readonly campaignQueue: Queue
+		private readonly campaignQueue: Queue,
+		@InjectQueue(UPLOAD_USER_MEDIA_QUEUE_NAME)
+		private readonly uploadUserMediaQueue: Queue
 	) {}
 
 	@OnEvent('send.verification-otp')
@@ -61,6 +65,14 @@ export class QueuesService {
 			images: payload.images,
 			video: payload.video,
 			id: payload.id
+		})
+	}
+
+	@OnEvent('add.user-avatar')
+	async addUserAvatar(payload: UploadUserAvatarDto) {
+		await this.uploadUserMediaQueue.add('upload-avatar', {
+			id: payload.id,
+			avatar: payload.avatar
 		})
 	}
 }

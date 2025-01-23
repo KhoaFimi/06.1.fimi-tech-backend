@@ -2,14 +2,20 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpCode,
+	HttpStatus,
 	Param,
 	Post,
 	Put,
-	UseGuards
+	UploadedFile,
+	UseGuards,
+	UseInterceptors
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import {
 	ApiBearerAuth,
 	ApiBody,
+	ApiConsumes,
 	ApiParam,
 	ApiSecurity,
 	ApiTags
@@ -172,6 +178,7 @@ export class AccountsController {
 	// #region: Request change email
 	@Post('/request-change-email/:id')
 	@UseGuards(AccessTokenGuard)
+	@HttpCode(HttpStatus.OK)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Yêu cầu thay đổi email thành công.'
@@ -209,6 +216,34 @@ export class AccountsController {
 	// #endregion
 
 	// #region: Change avatar
-
+	@Post('/change-avatar/:id')
+	@UseGuards(AccessTokenGuard)
+	@HttpCode(HttpStatus.OK)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thêm ảnh đại diện thành công'
+	})
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				avatar: {
+					type: 'string',
+					format: 'binary'
+				}
+			}
+		}
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	@UseInterceptors(FileInterceptor('avatar'))
+	async changeAvatar(
+		@Param('id') id: string,
+		@UploadedFile() avatar: Express.Multer.File
+	) {
+		await this.accountsService.changeAvatar(id, avatar)
+	}
 	// #endregion
 }

@@ -8,3 +8,4 @@ export enum QueuePrefix {
 export const OTP_QUEUE_NAME = 'otp-queue'
 export const UPLOAD_FILE_QUEUE_NAME = 'upload-file'
 export const ADD_CAMPAIGN_MEDIA_QUEUE_NAME = 'add-campaign-media'
+export const UPLOAD_USER_MEDIA_QUEUE_NAME = 'upload-user-media'
