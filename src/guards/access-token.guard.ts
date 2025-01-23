@@ -16,7 +16,14 @@ export class AccessTokenGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest<ExtendedRequest>()
 
-		const accessToken = request.headers.authorization.split(' ')[1]
+		const authReq = request.headers.authorization
+
+		if (!authReq)
+			throw new UnauthorizedException('Không có quyền truy cập', {
+				description: ErrorCode.UNAUTHORIZED_ERROR
+			})
+
+		const accessToken = authReq.split(' ')[1]
 
 		if (!accessToken)
 			throw new UnauthorizedException('Không có quyền truy cập', {
