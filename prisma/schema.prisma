@@ -16,7 +16,7 @@ enum GENDER {
 // #endregion
 
 // #region:Common Type
-type Image {
+type File {
   key String
   url String
 }
@@ -53,7 +53,7 @@ type Profile {
   dateOfBirth    DateTime? @map("date_of_birth")
   placeOfBirth   String?   @map("place_of_birth")
   gender         GENDER?
-  avatar         Image?
+  avatar         File?
   workAt         String?   @map("work_at")
   currentAddress Address?
   bank           Bank?
@@ -75,10 +75,10 @@ type Bank {
 type Document {
   citizenIdentification String?   @map("citizen_identification")
   dateOfIssue           DateTime? @map("date_of_issue")
-  placeOfIssue          DateTime? @map("place_of_issue")
-  imageFront            Image?    @map("image_front")
-  imageBack             Image?    @map("image_back")
-  potrait               Image?
+  placeOfIssue          String?   @map("place_of_issue")
+  imageFront            File?     @map("image_front")
+  imageBack             File?     @map("image_back")
+  potrait               File?
   spec                  Json?
 }
 
@@ -189,7 +189,7 @@ model Campaign {
   link                String?
   categoryId          String                    @db.ObjectId
   category            Category                  @relation(fields: [categoryId], references: [id])
-  images              Image[]
+  images              File[]
   video               String?
   offers              CampaignOffer[]
   info                CampaignInfo?

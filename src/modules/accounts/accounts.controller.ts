@@ -8,10 +8,14 @@ import {
 	Post,
 	Put,
 	UploadedFile,
+	UploadedFiles,
 	UseGuards,
 	UseInterceptors
 } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
+import {
+	FileFieldsInterceptor,
+	FileInterceptor
+} from '@nestjs/platform-express'
 import {
 	ApiBearerAuth,
 	ApiBody,
@@ -37,6 +41,8 @@ import { ForgotPasswordDto } from '@/modules/accounts/dtos/forgot-password.dto'
 import { NewVerificationDto } from '@/modules/accounts/dtos/new-verification.dto'
 import { ResetPasswordDto } from '@/modules/accounts/dtos/reset-password.dto'
 import { UpdateUserInfoDto } from '@/modules/accounts/dtos/update-user-info.dto'
+import { IdentifierCardImageFilter } from '@/modules/accounts/filters/identifier-card-image.filter'
+import { PotraitFilter } from '@/modules/accounts/filters/potrait.filter'
 import { User } from '@/modules/users/entities/user.entity'
 
 @Controller('accounts')
@@ -244,6 +250,81 @@ export class AccountsController {
 		@UploadedFile() avatar: Express.Multer.File
 	) {
 		await this.accountsService.changeAvatar(id, avatar)
+	}
+	// #endregion
+
+	// #region: Upload CCCD
+	@Post('/upload-document/identifier/:id')
+	@UseGuards(AccessTokenGuard)
+	@HttpCode(HttpStatus.OK)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thêm ảnh căn cước công dân thành công'
+	})
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				front: {
+					type: 'string',
+					format: 'binary'
+				},
+				back: {
+					type: 'string',
+					format: 'binary'
+				}
+			}
+		}
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	@UseInterceptors(
+		FileFieldsInterceptor([
+			{ name: 'front', maxCount: 1 },
+			{ name: 'back', maxCount: 1 }
+		])
+	)
+	async uploadIdentifierCardImage(
+		@Param('id') id: string,
+		@UploadedFiles(new IdentifierCardImageFilter())
+		files: { front?: Express.Multer.File[]; back?: Express.Multer.File[] }
+	) {
+		await this.accountsService.addIdentifierCardImage(id, files)
+	}
+	// #endregion
+
+	// #region: Upload potrait
+	@Post('/upload-document/potrait/:id')
+	@UseGuards(AccessTokenGuard)
+	@HttpCode(HttpStatus.OK)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thêm ảnh chân dung thành công'
+	})
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				potrait: {
+					type: 'string',
+					format: 'binary'
+				}
+			}
+		}
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	@UseInterceptors(FileInterceptor('potrait'))
+	async uploadPotraitImage(
+		@Param('id') id: string,
+		@UploadedFile(new PotraitFilter())
+		potrait: Express.Multer.File
+	) {
+		await this.accountsService.addPotraitImage(id, potrait)
 	}
 	// #endregion
 }

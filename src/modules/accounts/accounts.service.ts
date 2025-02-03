@@ -18,8 +18,10 @@ import { ForgotPasswordDto } from '@/modules/accounts/dtos/forgot-password.dto'
 import { NewVerificationDto } from '@/modules/accounts/dtos/new-verification.dto'
 import { ResetPasswordDto } from '@/modules/accounts/dtos/reset-password.dto'
 import { UpdateUserInfoDto } from '@/modules/accounts/dtos/update-user-info.dto'
+import { AddIdentifierCardImageDto } from '@/modules/queues/dtos/add-identifier-card-image.dto'
+import { AddPotraitImageDto } from '@/modules/queues/dtos/add-potrait-image.dto'
+import { AddUserAvatarDto } from '@/modules/queues/dtos/add-user-media.dto'
 import { SendOtpDto } from '@/modules/queues/dtos/send-otp.dto'
-import { UploadUserAvatarDto } from '@/modules/queues/dtos/upload-user-media.dto'
 import { ChangeEmailTokenService } from '@/modules/tokens/services/change-email-token.service'
 import { ResetPasswordTokenService } from '@/modules/tokens/services/reset-password-token.service'
 import { VerificationTokenService } from '@/modules/tokens/services/verification-token.service'
@@ -125,7 +127,17 @@ export class AccountsService {
 		const res = await this.usersService.update(existingUser.id, {
 			...updateUserDto,
 			profile: {
-				...updateUserDto.profile
+				...existingUser.profile,
+				...updateUserDto.profile,
+				bank: {
+					...existingUser.profile.bank,
+					...updateUserDto.profile.bank,
+					accountName: updateUserDto.profile.bank.accountName.toUpperCase()
+				}
+			},
+			document: {
+				...existingUser.document,
+				...updateUserDto.document
 			}
 		})
 
@@ -259,9 +271,37 @@ export class AccountsService {
 
 		await this.eventEmiter.emit(
 			'add.user-avatar',
-			new UploadUserAvatarDto({
+			new AddUserAvatarDto({
 				id: existingUser.id,
 				avatar: avatar
+			})
+		)
+	}
+
+	async addIdentifierCardImage(
+		id: string,
+		files: { front?: Express.Multer.File[]; back?: Express.Multer.File[] }
+	) {
+		const existingUser = await this.checkExistingUser(id)
+
+		await this.eventEmiter.emit(
+			'add.user-identifier-image',
+			new AddIdentifierCardImageDto({
+				id: existingUser.id,
+				front: files.front[0],
+				back: files.back[0]
+			})
+		)
+	}
+
+	async addPotraitImage(id: string, potrait: Express.Multer.File) {
+		const existingUser = await this.checkExistingUser(id)
+
+		await this.eventEmiter.emit(
+			'add.user-potrait',
+			new AddPotraitImageDto({
+				id: existingUser.id,
+				potrait
 			})
 		)
 	}

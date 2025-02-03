@@ -9,10 +9,10 @@ importers:
   .:
     dependencies:
       '@nestjs-modules/mailer':
-        specifier: ^2.0.2
+        specifier: 2.0.2
         version: 2.0.2(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.15)(nodemailer@6.9.16)
       '@nestjs/bullmq':
-        specifier: ^10.2.3
+        specifier: 10.2.3
         version: 10.2.3(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.15)(bullmq@5.34.10)
       '@nestjs/common':
         specifier: 10.4.15
@@ -24,10 +24,10 @@ importers:
         specifier: 10.4.15
         version: 10.4.15(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/event-emitter':
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.15)
       '@nestjs/jwt':
-        specifier: ^10.2.0
+        specifier: 10.2.0
         version: 10.2.0(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@nestjs/mapped-types':
         specifier: '*'
@@ -36,31 +36,31 @@ importers:
         specifier: 10.4.15
         version: 10.4.15(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.15)
       '@nestjs/swagger':
-        specifier: ^8.1.1
+        specifier: 8.1.1
         version: 8.1.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.15)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@prisma/client':
-        specifier: ^6.2.1
+        specifier: 6.2.1
         version: 6.2.1(prisma@6.2.1)
       argon2:
-        specifier: ^0.41.1
+        specifier: 0.41.1
         version: 0.41.1
       bullmq:
-        specifier: ^5.34.10
+        specifier: 5.34.10
         version: 5.34.10
       cloudinary:
-        specifier: ^2.5.1
+        specifier: 2.5.1
         version: 2.5.1
       googleapis:
-        specifier: ^144.0.0
+        specifier: 144.0.0
         version: 144.0.0
       nestjs-cloudinary:
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       nodemailer:
-        specifier: ^6.9.16
+        specifier: 6.9.16
         version: 6.9.16
       otp-generator:
-        specifier: ^4.0.1
+        specifier: 4.0.1
         version: 4.0.1
       reflect-metadata:
         specifier: 0.2.2
@@ -100,28 +100,28 @@ importers:
         specifier: 29.5.14
         version: 29.5.14
       '@types/multer':
-        specifier: ^1.4.12
+        specifier: 1.4.12
         version: 1.4.12
       '@types/node':
         specifier: 22.10.6
         version: 22.10.6
       '@types/nodemailer':
-        specifier: ^6.4.17
+        specifier: 6.4.17
         version: 6.4.17
       '@types/otp-generator':
-        specifier: ^4.0.2
+        specifier: 4.0.2
         version: 4.0.2
       '@types/supertest':
         specifier: 6.0.2
         version: 6.0.2
       class-transformer:
-        specifier: ^0.5.1
+        specifier: 0.5.1
         version: 0.5.1
       class-validator:
-        specifier: ^0.14.1
+        specifier: 0.14.1
         version: 0.14.1
       dotenv-cli:
-        specifier: ^8.0.0
+        specifier: 8.0.0
         version: 8.0.0
       eslint:
         specifier: 9.18.0
@@ -154,7 +154,7 @@ importers:
         specifier: 3.4.2
         version: 3.4.2
       prisma:
-        specifier: ^6.2.1
+        specifier: 6.2.1
         version: 6.2.1
       source-map-support:
         specifier: 0.5.21
