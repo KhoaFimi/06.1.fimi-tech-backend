@@ -1,13 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional } from 'class-validator'
+import { ArrayMinSize, IsArray, IsNotEmpty } from 'class-validator'
 
 export class CampaignOfferDto {
 	@ApiProperty()
-	@IsNotEmpty({ message: 'Vui lòng điền tiêu đề của ưu đãi' })
-	title: string
-
-	@ApiProperty()
-	@IsOptional()
+	@IsNotEmpty({ message: 'Vui lòng thêm tóm tắt cho ưu đãi' })
 	summary: string
 
 	@ApiProperty()

@@ -145,7 +145,6 @@ enum CampaignStatus {
 }
 
 type CampaignOffer {
-  title   String
   summary String
   offers  String[]
 }
