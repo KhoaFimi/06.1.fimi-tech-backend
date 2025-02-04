@@ -7,12 +7,18 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 	UploadedFiles,
 	UseGuards,
 	UseInterceptors
 } from '@nestjs/common'
 import { FilesInterceptor } from '@nestjs/platform-express'
-import { ApiBearerAuth, ApiConsumes, ApiSecurity } from '@nestjs/swagger'
+import {
+	ApiBearerAuth,
+	ApiConsumes,
+	ApiQuery,
+	ApiSecurity
+} from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
@@ -118,15 +124,21 @@ export class CampaignsController {
 		statusCode: SuccessCode.OK,
 		message: 'Thay đổi trạng thái chiến dịch thành công thành công'
 	})
+	@ApiQuery({ name: 'page', default: 0, type: Number })
+	@ApiQuery({ name: 'limit', default: 10, type: Number })
 	@ApiBearerAuth()
 	@ApiSecurity('api-key')
 	@ApiSecurity('partner-code')
-	async getCampaignByCategory(@Param('categoryId') id: string) {
+	async getCampaignByCategory(
+		@Param('categoryId') id: string,
+		@Query('page') page: number = 0,
+		@Query('limit') limit: number = 10
+	) {
 		const res = await this.campaignsService.findAll(
 			{
 				categoryId: id
 			},
-			{ page: 0, limit: 10 },
+			{ page, limit },
 			{
 				include: {
 					category: {
