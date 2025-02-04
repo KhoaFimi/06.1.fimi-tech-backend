@@ -88,7 +88,8 @@ export class CampaignsService {
 	// #region: Common servcice
 	async findAll(
 		where: FindAllCampaignDto,
-		{ page = 0, limit = 10 }: FindAllParams
+		{ page = 0, limit = 10 }: FindAllParams,
+		options?: FindCampaignDto
 	) {
 		const take = limit
 		const skip = (page + 1) * limit
@@ -96,6 +97,7 @@ export class CampaignsService {
 		const [campaigns, count] = await this.db.$transaction([
 			this.db.campaign.findMany({
 				where,
+				...options,
 				take,
 				skip
 			}),
@@ -160,6 +162,21 @@ export class CampaignsService {
 		})
 
 		return res
+	}
+
+	async softDelete(id: string) {
+		return await this.db.user.update({
+			where: { id },
+			data: {
+				isDelete: true
+			}
+		})
+	}
+
+	async pernamentDeltete(id: string) {
+		return this.db.user.delete({
+			where: { id }
+		})
 	}
 
 	// #region: Local service

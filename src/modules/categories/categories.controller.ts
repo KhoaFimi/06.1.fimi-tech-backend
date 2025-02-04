@@ -1,8 +1,30 @@
-import { Controller } from '@nestjs/common'
+import { Controller, Get, UseGuards } from '@nestjs/common'
+import { ApiBearerAuth, ApiSecurity } from '@nestjs/swagger'
+
+import { SuccessCode } from '@/constraints/code.constraints'
+import { ResponseBody } from '@/decorators/response-message.decorator'
+import { AccessTokenGuard } from '@/guards/access-token.guard'
 
 import { CategoriesService } from './categories.service'
 
 @Controller('categories')
 export class CategoriesController {
 	constructor(private readonly categoriesService: CategoriesService) {}
+
+	// #region: Get all category
+	@Get('/')
+	@UseGuards(AccessTokenGuard)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Lấy danh mục'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async getCategories() {
+		const res = await this.categoriesService.findAll({})
+
+		return res
+	}
+	// #endregion
 }

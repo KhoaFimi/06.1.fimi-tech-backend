@@ -9,7 +9,6 @@ import {
 } from '@/modules/categories/dtos/find-category.dto'
 import { UpdateCategoryDto } from '@/modules/categories/dtos/update-category.dto'
 import { PrismaService } from '@/shared/services/prisma.service'
-import { FindAllParams } from '@/types/common.type'
 
 @Injectable()
 export class CategoriesService {
@@ -23,24 +22,16 @@ export class CategoriesService {
 		})
 	}
 
-	async findAll(
-		where: FindAllCategoryDto,
-		{ page = 0, limit = 10 }: FindAllParams
-	) {
-		const take = limit
-		const skip = (page + 1) * limit
-
-		const [categorys, count] = await this.db.$transaction([
+	async findAll(where: FindAllCategoryDto) {
+		const [categories, count] = await this.db.$transaction([
 			this.db.category.findMany({
-				where,
-				take,
-				skip
+				where
 			}),
 			this.db.category.count({ where })
 		])
 
 		return {
-			categorys,
+			categories,
 			count
 		}
 	}

@@ -37,6 +37,7 @@ export class Campaign {
 	advertiser: string
 
 	@ApiProperty()
+	@Exclude()
 	link: string
 
 	@ApiProperty()

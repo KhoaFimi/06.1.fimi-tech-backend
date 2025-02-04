@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
 
 export type FindCampaignDto = {
-	include: Prisma.CampaignInclude
-	omit: Prisma.CampaignOmit
+	include?: Prisma.CampaignInclude
+	omit?: Prisma.CampaignOmit
 }
 
 export type FindUniqueCampaignDto = Prisma.CampaignWhereUniqueInput

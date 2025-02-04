@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
 	HttpStatus,
 	Param,
@@ -11,11 +12,12 @@ import {
 	UseInterceptors
 } from '@nestjs/common'
 import { FilesInterceptor } from '@nestjs/platform-express'
-import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiConsumes, ApiSecurity } from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
+import { AccessTokenGuard } from '@/guards/access-token.guard'
 import { IsAdminGuard } from '@/guards/is-admin.guard'
 import { CampaignsService } from '@/modules/campaigns/campaigns.service'
 import { AddCampaignInfoDto } from '@/modules/campaigns/dtos/add-campaign-info.dto'
@@ -104,6 +106,42 @@ export class CampaignsController {
 
 		return {
 			campaign: plainToClass(Campaign, res)
+		}
+	}
+	// #endregion
+
+	// #region: Find Campaign by Category
+	@Get('/:categoryId')
+	@UseGuards(AccessTokenGuard)
+	@HttpCode(HttpStatus.OK)
+	@ResponseBody({
+		statusCode: SuccessCode.OK,
+		message: 'Thay đổi trạng thái chiến dịch thành công thành công'
+	})
+	@ApiBearerAuth()
+	@ApiSecurity('api-key')
+	@ApiSecurity('partner-code')
+	async getCampaignByCategory(@Param('categoryId') id: string) {
+		const res = await this.campaignsService.findAll(
+			{
+				categoryId: id
+			},
+			{ page: 0, limit: 10 },
+			{
+				include: {
+					category: {
+						select: {
+							id: true,
+							name: true
+						}
+					}
+				}
+			}
+		)
+
+		return {
+			campaigns: plainToClass(Campaign, res.campaigns),
+			count: res.count
 		}
 	}
 	// #endregion
