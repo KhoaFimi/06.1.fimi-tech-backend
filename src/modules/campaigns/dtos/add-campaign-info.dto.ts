@@ -4,6 +4,7 @@ import {
 	ArrayMinSize,
 	IsArray,
 	IsNotEmpty,
+	IsOptional,
 	ValidateNested
 } from 'class-validator'
 
@@ -22,6 +23,10 @@ export class AddCampaignInfoDto {
 	@ApiProperty()
 	@IsNotEmpty({ message: 'Vui lòng thêm link cho chiến dịch' })
 	link: string
+
+	@ApiProperty()
+	@IsOptional()
+	subLink: string
 
 	@ApiProperty()
 	@IsArray()

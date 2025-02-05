@@ -42,6 +42,10 @@ export class Campaign {
 
 	@ApiProperty()
 	@Exclude()
+	subLink: string
+
+	@ApiProperty()
+	@Exclude()
 	categoryId: string
 
 	@ApiProperty({ type: Category })

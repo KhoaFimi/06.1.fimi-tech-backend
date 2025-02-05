@@ -25,26 +25,27 @@ type File {
 
 // #region:User
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  code          String    @unique @map("pub_code")
-  fullname      String
-  phone         String    @unique
-  email         String    @unique
-  emailVerified DateTime? @map("email_verified")
-  password      String    @unique
-  roles         Int       @default(0) //0: pub/am, 1:partner, >=2: admin
-  document      Document?
-  profile       Profile?
-  tnc           Boolean   @default(false)
-  partnerId     String    @db.ObjectId
-  partner       Partner   @relation(fields: [partnerId], references: [id])
-  managerId     String?   @db.ObjectId
-  manager       User?     @relation("manage", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  manage        User[]    @relation("manage")
-  createdAt     DateTime  @default(now())
-  isDelete      Boolean   @default(false)
-  updatedAt     DateTime  @updatedAt
-  refreshToken  String?
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  code                String    @unique @map("pub_code")
+  fullname            String
+  phone               String    @unique
+  email               String    @unique
+  emailVerified       DateTime? @map("email_verified")
+  password            String    @unique
+  roles               Int       @default(0) //0: pub/am, 1:partner, >=2: admin
+  commissionAvailable Int       @default(0)
+  document            Document?
+  profile             Profile?
+  tnc                 Boolean   @default(false)
+  partnerId           String    @db.ObjectId
+  partner             Partner   @relation(fields: [partnerId], references: [id])
+  managerId           String?   @db.ObjectId
+  manager             User?     @relation("manage", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manage              User[]    @relation("manage")
+  createdAt           DateTime  @default(now())
+  isDelete            Boolean   @default(false)
+  updatedAt           DateTime  @updatedAt
+  refreshToken        String?
 
   @@map("user")
 }
@@ -166,26 +167,34 @@ type CampaignSpec {
   description String[]
 }
 
+type CampaignSubCommissionPolicy {
+  add         Int
+  description String?
+}
+
 type CampaignCommissionPolicy {
-  orderStatus String   @default("Phê duyệt")
-  description String
-  commissions String[]
-  note        String?
+  orderStatus    String
+  description    String
+  commissions    Int
+  comDescription String
+  subCom         CampaignSubCommissionPolicy[]
+  note           String?
 }
 
 type CampaignRecognitionRules {
-  summary     String
-  description String[]
-  note        String?
+  summary String
+  rules   String[]
+  note    String?
 }
 
 model Campaign {
   id                  String                    @id @default(auto()) @map("_id") @db.ObjectId
-  code                String                    @unique
+  code                String
   status              CampaignStatus            @default(UNVERIFY)
   name                String
   advertiser          String?
   link                String?
+  subLink             String?
   categoryId          String                    @db.ObjectId
   category            Category                  @relation(fields: [categoryId], references: [id])
   images              File[]

@@ -1,6 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional } from 'class-validator'
 
+export class CampaignSubCommissionPolicyDto {
+	@ApiProperty()
+	@IsOptional()
+	add: number
+
+	@ApiProperty()
+	@IsOptional()
+	description: number
+}
+
 export class CampaignCommissionPolicyDto {
 	@ApiProperty()
 	@IsOptional()
@@ -22,4 +32,8 @@ export class CampaignCommissionPolicyDto {
 	@ApiProperty()
 	@IsOptional()
 	note: string
+
+	@ApiProperty({ type: CampaignSubCommissionPolicyDto })
+	@IsArray()
+	subCom: CampaignSubCommissionPolicyDto
 }

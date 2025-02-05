@@ -11,7 +11,7 @@ export class CampaignRecognitionRulesDto {
 	@ArrayMinSize(1, {
 		message: 'Vui lòng thêm ít nhất 1 điều khoản ghi nhận'
 	})
-	description: string[]
+	rules: string[]
 
 	@ApiProperty()
 	@IsOptional()
