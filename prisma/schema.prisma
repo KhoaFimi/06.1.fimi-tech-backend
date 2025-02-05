@@ -169,7 +169,7 @@ type CampaignSpec {
 
 type CampaignSubCommissionPolicy {
   add         Int
-  description String?
+  description String
 }
 
 type CampaignCommissionPolicy {

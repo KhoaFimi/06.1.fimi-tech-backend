@@ -1,6 +1,5 @@
 import {
 	BadRequestException,
-	ConflictException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
@@ -34,10 +33,7 @@ export class CampaignsService {
 
 	// #region: Create combo service
 	public async init(initCampaignDto: InitCampaignDto) {
-		await this.verifyCreateData({
-			campaignCode: initCampaignDto.code,
-			categoryId: initCampaignDto.categoryId
-		})
+		await this.verifyCreateData(initCampaignDto.categoryId)
 
 		const newCampaign = await this.db.campaign.create({
 			data: {
@@ -55,7 +51,18 @@ export class CampaignsService {
 		return await this.db.campaign.update({
 			where: { id: campaignId },
 			data: {
-				...addCampaignInfoDto
+				advertiser: addCampaignInfoDto.advertiser,
+				link: addCampaignInfoDto.link,
+				subLink: addCampaignInfoDto.subLink,
+				offers: addCampaignInfoDto.offers,
+				info: addCampaignInfoDto.info,
+				specs: addCampaignInfoDto.specs,
+				requirement: addCampaignInfoDto.requirement,
+				commissionPolicy: addCampaignInfoDto.commissionPolicy,
+				recognitionRules: addCampaignInfoDto.recognitionRules,
+				registrationProcess: addCampaignInfoDto.registrationProcess,
+				rejectReason: addCampaignInfoDto.rejectReason,
+				unqualifiedRecords: addCampaignInfoDto.unqualifiedRecords
 			}
 		})
 	}
@@ -180,32 +187,7 @@ export class CampaignsService {
 	}
 
 	// #region: Local service
-	private async verifyCreateData({
-		campaignCode,
-		categoryId
-	}: {
-		campaignCode: string
-		categoryId: string
-	}) {
-		const existingCampaign = await this.db.campaign.findUnique({
-			where: { code: campaignCode }
-		})
-
-		if (existingCampaign) {
-			throw new ConflictException('Mã chiến dịch đã tồn tại trên hệ thống', {
-				description: ErrorCode.VAL_ERROR,
-				cause: {
-					validationError: [
-						{
-							field: 'code',
-							detail:
-								'Mã chiến dịch đã tồn tại trên hệ thống, vui lòng đặt một mã mới'
-						}
-					]
-				}
-			})
-		}
-
+	private async verifyCreateData(categoryId: string) {
 		const existingCategory =
 			await this.categoriesService.findOneById(categoryId)
 

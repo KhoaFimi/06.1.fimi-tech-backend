@@ -3,12 +3,10 @@ import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional } from 'class-validator'
 
 export class CampaignSubCommissionPolicyDto {
 	@ApiProperty()
-	@IsOptional()
 	add: number
 
 	@ApiProperty()
-	@IsOptional()
-	description: number
+	description: string
 }
 
 export class CampaignCommissionPolicyDto {
@@ -27,7 +25,13 @@ export class CampaignCommissionPolicyDto {
 	@ArrayMinSize(1, {
 		message: 'Vui lòng thêm ít nhất 1 mốc hoa hồng và điều kiện nhận'
 	})
-	commissions: string[]
+	commissions: number
+
+	@ApiProperty()
+	@IsNotEmpty({
+		message: 'Vui lòng thêm mô tả về hoa hồng'
+	})
+	comDescription: string
 
 	@ApiProperty()
 	@IsOptional()
