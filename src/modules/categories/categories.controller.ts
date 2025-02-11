@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiSecurity } from '@nestjs/swagger'
+import { ApiBearerAuth } from '@nestjs/swagger'
 
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
@@ -19,8 +19,6 @@ export class CategoriesController {
 		message: 'Lấy danh mục'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async getCategories() {
 		const res = await this.categoriesService.findAll({})
 

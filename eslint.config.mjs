@@ -7,6 +7,9 @@ import globals from 'globals'
 import ts from 'typescript-eslint'
 
 export default ts.config(
+	{
+		ignores: ['/dist', '/node_modules', '/build']
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	eslintConfigPrettier,
@@ -51,8 +54,5 @@ export default ts.config(
 			'import/newline-after-import': 'error',
 			'import/no-duplicates': 'error'
 		}
-	},
-	{
-		ignores: ['/dist', '/node_modules', '/build']
 	}
 )

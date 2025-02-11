@@ -1,5 +1,5 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiSecurity } from '@nestjs/swagger'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
@@ -21,8 +21,6 @@ export class UsersController {
 		message: 'Lấy thông tin người dùng thành công'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async me(@Req() request: ExtendedRequest) {
 		return {
 			user: plainToClass(User, request.user)

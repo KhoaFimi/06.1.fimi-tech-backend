@@ -86,15 +86,22 @@ type Document {
 // #endregion
 
 // #region: Partner
+type PartnerAssest {
+  logo           File
+  priamaryColor  String
+  secondaryColor String
+}
+
 model Partner {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  code       String      @unique
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  code       String        @unique
+  name       String
   publsihers User[]
   prize      PricePolicy
-  apiKey     String
-  isDelete   Boolean     @default(false)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  assest     PartnerAssest
+  isDelete   Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   @@map("partners")
 }

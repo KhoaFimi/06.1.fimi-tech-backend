@@ -46,12 +46,19 @@ export class ApiConfigService {
 		return this.getString('HOST')
 	}
 
+	get frontendBaseUrl(): string {
+		return this.getString('FRONTEND_BASE_URL')
+	}
+
 	get baseUrl(): string {
 		const port = this.getNumber('PORT')
 		const host = this.getString('HOST')
 		const isProd = this.isProduction
+		const isUat = this.isUat
 
 		if (isProd) return this.getString('BASE_URL')
+
+		if (isUat) return this.getString('UAT_URL')
 
 		return `http://${host}:${port}`
 	}

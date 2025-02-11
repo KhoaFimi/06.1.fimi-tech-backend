@@ -25,31 +25,33 @@ export class QueuesService {
 		private readonly uploadUserMediaQueue: Queue
 	) {}
 
-	@OnEvent('send.verification-otp')
-	async addSendVerificationOtpQueue(payload: SendOtpDto) {
+	@OnEvent('send.verification')
+	async addSendVerificationQueue(payload: SendOtpDto) {
 		await this.otpQueue.add(
 			'verification',
 			{
 				id: payload.id,
-				email: payload.email
+				email: payload.email,
+				partner: payload.partner
 			},
 			{ removeOnComplete: true }
 		)
 	}
 
-	@OnEvent('send.reset-password-otp')
+	@OnEvent('send.reset-password')
 	async addSendResetPasswordOtpQueue(payload: SendOtpDto) {
 		await this.otpQueue.add(
 			'reset-password',
 			{
 				id: payload.id,
-				email: payload.email
+				email: payload.email,
+				partner: payload.partner
 			},
 			{ removeOnComplete: true }
 		)
 	}
 
-	@OnEvent('send.change-email-otp')
+	@OnEvent('send.change-email')
 	async addSendChangeEmailOtpQueue(payload: SendOtpDto) {
 		await this.otpQueue.add(
 			'change-email',

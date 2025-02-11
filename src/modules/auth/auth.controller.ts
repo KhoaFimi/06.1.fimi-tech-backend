@@ -8,17 +8,10 @@ import {
 	Req,
 	UseGuards
 } from '@nestjs/common'
-import {
-	ApiBody,
-	ApiHeader,
-	ApiParam,
-	ApiSecurity,
-	ApiTags
-} from '@nestjs/swagger'
+import { ApiBody, ApiHeader, ApiParam, ApiTags } from '@nestjs/swagger'
 
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
-import { VerifyPartnerGuard } from '@/guards/verify-partner.guard'
 import { AuthService } from '@/modules/auth/auth.service'
 import { SignInDto } from '@/modules/auth/dto/sign-in.dto'
 import { SignUpDto } from '@/modules/auth/dto/sign-up.dto'
@@ -32,7 +25,6 @@ export class AuthController {
 
 	// #region: sign up
 	@Post('/sign-up')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.CREATED,
 		message: 'Đăng ký thành công'
@@ -46,6 +38,7 @@ export class AuthController {
 					email: 'khoa.trandang30620@gmail.com',
 					phone: '0915527911',
 					password: 'Wynrius479',
+					partnerCode: 'FIMI',
 					tnc: true
 				} as SignUpDto
 			},
@@ -55,16 +48,15 @@ export class AuthController {
 					email: 'khoa.trandang30620@gmail.com',
 					phone: '0915527911',
 					password: 'Wynrius479',
+					partnerCode: 'FIMI',
 					ref: '6788bf86f192d3881f454e36',
 					tnc: true
 				} as SignUpDto
 			}
 		}
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
-	async signUp(@Req() request: ExtendedRequest, @Body() body: SignUpDto) {
-		const res = await this.authService.signUp(request.partnerCode, body)
+	async signUp(@Body() body: SignUpDto) {
+		const res = await this.authService.signUp(body)
 
 		return res
 	}
@@ -72,7 +64,6 @@ export class AuthController {
 
 	// #region: sign in
 	@Post('/sign-in')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Đăng nhập thành công'
@@ -88,8 +79,6 @@ export class AuthController {
 			}
 		}
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async signIn(@Body() body: SignInDto) {
 		const res = await this.authService.signIn(body)
 
@@ -99,7 +88,6 @@ export class AuthController {
 
 	// #region: sign out
 	@Put('/sign-out/:id')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Đăng xuất thành công'
@@ -108,8 +96,6 @@ export class AuthController {
 		name: 'id',
 		required: true
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async signOut(@Param('id') id: string) {
 		const res = await this.authService.signOut(id)
 
@@ -119,7 +105,7 @@ export class AuthController {
 
 	// #region: refresh token
 	@Get('/refresh-token')
-	@UseGuards(VerifyPartnerGuard, RefreshTokenGuard)
+	@UseGuards(RefreshTokenGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Lấy token mới thành công'
@@ -128,8 +114,6 @@ export class AuthController {
 		name: 'X-REFRESH-TOKEN',
 		required: true
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async refreshToken(@Req() requuest: ExtendedRequest) {
 		const user = requuest.user
 

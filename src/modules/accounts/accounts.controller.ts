@@ -29,7 +29,6 @@ import { plainToClass } from 'class-transformer'
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
 import { AccessTokenGuard } from '@/guards/access-token.guard'
-import { VerifyPartnerGuard } from '@/guards/verify-partner.guard'
 import { AccountsService } from '@/modules/accounts/accounts.service'
 import {
 	ChangeEmaiDto,
@@ -52,13 +51,10 @@ export class AccountsController {
 
 	// #region: new verification
 	@Post('new-verification')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Xác thực thành công'
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async newVerification(@Body() body: NewVerificationDto) {
 		await this.accountsService.newVerification(body)
 	}
@@ -66,7 +62,6 @@ export class AccountsController {
 
 	// #region: get new otp
 	@Get('/new-otp/:key')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Lấy OTP mới thành công'
@@ -75,10 +70,8 @@ export class AccountsController {
 		name: 'key',
 		required: true
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async newOtp(@Param('key') verificationKey: string) {
-		const res = await this.accountsService.getNewOtp(verificationKey)
+		const res = await this.accountsService.getNewVerifySession(verificationKey)
 
 		return res
 	}
@@ -86,7 +79,6 @@ export class AccountsController {
 
 	// #region: forgot password
 	@Post('/forgot-password')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Yêu cầu lấy lại mật khẩu thành công'
@@ -94,8 +86,6 @@ export class AccountsController {
 	@ApiBody({
 		type: ForgotPasswordDto
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async forgotPassword(@Body() body: ForgotPasswordDto) {
 		const res = await this.accountsService.forgotPassword(body)
 
@@ -105,7 +95,6 @@ export class AccountsController {
 
 	// #region: reset password
 	@Post('/reset-password')
-	@UseGuards(VerifyPartnerGuard)
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Tạo mật khẩu mới thành công'
@@ -113,8 +102,6 @@ export class AccountsController {
 	@ApiBody({
 		type: ResetPasswordDto
 	})
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async resetPassword(@Body() body: ResetPasswordDto) {
 		const res = await this.accountsService.resetPassword(body)
 
@@ -130,8 +117,6 @@ export class AccountsController {
 		message: 'Cập nhật thông tin người dùng thành công'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async UpdateUser(
 		@Param('id') id: string,
 		@Body() updateUserDto: UpdateUserInfoDto
@@ -170,8 +155,6 @@ export class AccountsController {
 		message: 'Thay đổi số điện thoại thành công.'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async ChangePhone(@Param('id') id: string, @Body() body: ChangeUserPhoneDto) {
 		const res = await this.accountsService.changePhone(id, body)
 
@@ -190,8 +173,6 @@ export class AccountsController {
 		message: 'Yêu cầu thay đổi email thành công.'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async RequestChangeEmail(
 		@Param('id') id: string,
 		@Body() body: RequestChangeEmailDto
@@ -210,8 +191,6 @@ export class AccountsController {
 		message: 'Thay đổi email thành công.'
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async ChangeEmail(@Body() body: ChangeEmaiDto) {
 		const res = await this.accountsService.changeEmail(body)
 
@@ -242,8 +221,6 @@ export class AccountsController {
 		}
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	@UseInterceptors(FileInterceptor('avatar'))
 	async changeAvatar(
 		@Param('id') id: string,
@@ -278,8 +255,6 @@ export class AccountsController {
 		}
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	@UseInterceptors(
 		FileFieldsInterceptor([
 			{ name: 'front', maxCount: 1 },
@@ -316,8 +291,6 @@ export class AccountsController {
 		}
 	})
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	@UseInterceptors(FileInterceptor('potrait'))
 	async uploadPotraitImage(
 		@Param('id') id: string,

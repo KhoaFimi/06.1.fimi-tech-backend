@@ -1,5 +1,4 @@
 const { PrismaClient } = require('@prisma/client')
-const argon2 = require('argon2')
 
 const prisma = new PrismaClient()
 
@@ -7,9 +6,17 @@ const main = async () => {
 	await prisma.partner.create({
 		data: {
 			code: 'FIMI',
-			apiKey: await argon2.hash('b8a66f7d-381e-47f8-afea-83c8b0a1fd3b'),
 			prize: {
 				origin: 0.95
+			},
+			name: 'Công ty TNHH Công Nghệ FIMI',
+			assest: {
+				logo: {
+					key: 'logo/logo_icr2ed',
+					url: 'https://res.cloudinary.com/dsmg2i2rl/image/upload/v1739264651/logo_icr2ed.png'
+				},
+				priamaryColor: '#800101',
+				secondaryColor: '#E9CFC3'
 			}
 		}
 	})

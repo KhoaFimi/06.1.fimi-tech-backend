@@ -1,10 +1,11 @@
+import { randomUUID as uuidV4 } from 'node:crypto'
+
 import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
 import * as argon2 from 'argon2'
-import * as otpGen from 'otp-generator'
 
 import { ErrorCode } from '@/constraints/code.constraints'
 import { ApiConfigService } from '@/shared/services/api-config.service'
@@ -28,14 +29,9 @@ export class ResetPasswordTokenService {
 			})
 		}
 
-		const otp = otpGen.generate(6, {
-			digits: true,
-			lowerCaseAlphabets: false,
-			upperCaseAlphabets: false,
-			specialChars: false
-		})
+		const token = uuidV4()
 
-		const token = await argon2.hash(otp)
+		const hashedToken = await argon2.hash(token)
 
 		const expires = new Date(
 			new Date().getTime() + this.apiConfig.resetPasswordTokenExpires * 1000
@@ -43,14 +39,14 @@ export class ResetPasswordTokenService {
 
 		await this.db.resetPasswordToken.create({
 			data: {
-				token,
+				token: hashedToken,
 				identifier,
 				expires
 			}
 		})
 
 		return {
-			otp
+			token
 		}
 	}
 

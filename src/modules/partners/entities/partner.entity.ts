@@ -1,1 +1,1 @@
-export class Platform {}
+export class Partner {}

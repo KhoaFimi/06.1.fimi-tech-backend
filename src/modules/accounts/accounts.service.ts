@@ -38,16 +38,19 @@ export class AccountsService {
 	) {}
 
 	public async newVerification(newVerificationDto: NewVerificationDto) {
-		const { verificationKey, otp } = newVerificationDto
+		const { verificationKey, token } = newVerificationDto
 
-		const res = await this.verificationTokenService.verify(otp, verificationKey)
+		const res = await this.verificationTokenService.verify(
+			token,
+			verificationKey
+		)
 
 		await this.usersService.update(res.identifier, {
 			emailVerified: new Date()
 		})
 	}
 
-	public async getNewOtp(verificationKey: string) {
+	public async getNewVerifySession(verificationKey: string) {
 		const existingUser = await this.usersService.findOneByUnique({
 			id: verificationKey
 		})
@@ -58,7 +61,7 @@ export class AccountsService {
 			})
 
 		this.eventEmiter.emit(
-			'send.verification-otp',
+			'send.verification',
 			new SendOtpDto({
 				id: existingUser.id,
 				email: existingUser.email
@@ -70,9 +73,17 @@ export class AccountsService {
 	}
 
 	public async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-		const existingUser = await this.usersService.findOneByUnique({
-			email: forgotPasswordDto.email
-		})
+		const existingUser = await this.usersService.findOneByUnique(
+			{
+				email: forgotPasswordDto.email
+			},
+			{
+				include: {
+					partner: true
+				},
+				omit: {}
+			}
+		)
 
 		if (!existingUser)
 			throw new NotFoundException('Email không chính xác', {
@@ -80,10 +91,11 @@ export class AccountsService {
 			})
 
 		this.eventEmiter.emit(
-			'send.reset-password-otp',
+			'send.reset-password',
 			new SendOtpDto({
 				id: existingUser.id,
-				email: existingUser.email
+				email: existingUser.email,
+				partner: existingUser.partner
 			})
 		)
 
@@ -93,10 +105,10 @@ export class AccountsService {
 	}
 
 	public async resetPassword(resetPasswordDto: ResetPasswordDto) {
-		const { verificationKey, otp, password } = resetPasswordDto
+		const { verificationKey, token, password } = resetPasswordDto
 
 		const res = await this.resetPasswordTokenService.verify(
-			otp,
+			token,
 			verificationKey
 		)
 
@@ -238,7 +250,7 @@ export class AccountsService {
 			})
 
 		this.eventEmiter.emit(
-			'send.change-email-otp',
+			'send.change-email',
 			new SendOtpDto({
 				id: existingUser.id,
 				email: requestChangeEmailDto.newEmail

@@ -44,4 +44,6 @@ export class SignUpDto {
 	})
 	@IsBoolean({ message: 'Giá trị không chính xác' })
 	tnc: boolean
+
+	partnerCode: string
 }

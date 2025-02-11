@@ -27,7 +27,7 @@ export class AuthService {
 		private readonly eventEmiter: EventEmitter2
 	) {}
 
-	public async signUp(partnerCode: string, signUpDto: SignUpDto) {
+	public async signUp(signUpDto: SignUpDto) {
 		const { fullname, email, password, phone, ref, tnc } = signUpDto
 
 		if (!tnc)
@@ -38,14 +38,14 @@ export class AuthService {
 				}
 			)
 
-		if (!partnerCode)
+		if (!signUpDto.partnerCode)
 			throw new NotAcceptableException('Yêu cầu mã Partner', {
 				description: ErrorCode.MISSING_ERROR
 			})
 
 		const [existingUser, existingPartner] = await Promise.all([
 			this.usersService.findOneByUnique({ email }),
-			this.partnersService.findOneByUnique({ code: partnerCode })
+			this.partnersService.findOneByUnique({ code: signUpDto.partnerCode })
 		])
 
 		if (existingUser)
@@ -90,10 +90,11 @@ export class AuthService {
 			})
 
 			this.eventEmiter.emit(
-				'send.verification-otp',
+				'send.verification',
 				new SendOtpDto({
 					id: newPublisher.id,
-					email: newPublisher.email
+					email: newPublisher.email,
+					partner: existingPartner
 				})
 			)
 
@@ -117,10 +118,11 @@ export class AuthService {
 		})
 
 		this.eventEmiter.emit(
-			'send.verification-otp',
+			'send.verification',
 			new SendOtpDto({
 				id: newPublisher.id,
-				email: newPublisher.email
+				email: newPublisher.email,
+				partner: existingPartner
 			})
 		)
 
@@ -151,7 +153,7 @@ export class AuthService {
 
 		if (!existingUser.emailVerified) {
 			this.eventEmiter.emit(
-				'send.verification-otp',
+				'send.verification',
 				new SendOtpDto({
 					id: existingUser.id,
 					email: existingUser.email

@@ -1,10 +1,11 @@
+import { randomUUID as uuidV4 } from 'node:crypto'
+
 import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
 import * as argon2 from 'argon2'
-import * as otpGen from 'otp-generator'
 
 import { ErrorCode } from '@/constraints/code.constraints'
 import { ApiConfigService } from '@/shared/services/api-config.service'
@@ -28,14 +29,9 @@ export class VerificationTokenService {
 			})
 		}
 
-		const otp = otpGen.generate(6, {
-			digits: true,
-			lowerCaseAlphabets: false,
-			upperCaseAlphabets: false,
-			specialChars: false
-		})
+		const token = uuidV4()
 
-		const token = await argon2.hash(otp)
+		const hashedToken = await argon2.hash(token)
 
 		const expires = new Date(
 			new Date().getTime() + this.apiConfig.verificationTokenExpires * 1000
@@ -43,14 +39,14 @@ export class VerificationTokenService {
 
 		await this.db.verificationToken.create({
 			data: {
-				token,
+				token: hashedToken,
 				identifier,
 				expires
 			}
 		})
 
 		return {
-			otp
+			token
 		}
 	}
 
@@ -71,7 +67,7 @@ export class VerificationTokenService {
 				where: { id: existingToken.id }
 			})
 
-			throw new UnauthorizedException('OTP đã hết hạn', {
+			throw new UnauthorizedException('Token đã hết hạn', {
 				description: ErrorCode.OTP_EXPIRES_ERROR
 			})
 		}
@@ -79,7 +75,7 @@ export class VerificationTokenService {
 		const verifyToken = await argon2.verify(existingToken.token, token)
 
 		if (!verifyToken)
-			throw new UnauthorizedException('OTP không chính xác', {
+			throw new UnauthorizedException('Token không chính xác', {
 				description: ErrorCode.WRONG_CREDENTIALS_ERROR
 			})
 

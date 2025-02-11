@@ -8,9 +8,9 @@ import {
 	UPLOAD_USER_MEDIA_QUEUE_NAME
 } from '@/constants/queue.constant'
 import { CampaignsModule } from '@/modules/campaigns/campaigns.module'
-import { OtpProcessor } from '@/modules/queues/processors/otp.processor'
 import { AddCampaignMediaProcessor } from '@/modules/queues/processors/upload-campaign-media.processor'
 import { UploadUserMediaProcessor } from '@/modules/queues/processors/upload-user-media.processor'
+import { VerifyProcessor } from '@/modules/queues/processors/verify.processor'
 import { QueuesService } from '@/modules/queues/queues.service'
 import { TokensModule } from '@/modules/tokens/tokens.module'
 import { UsersModule } from '@/modules/users/users.module'
@@ -36,7 +36,7 @@ import { SharedModule } from '@/shared/shared.module'
 		})
 	],
 	providers: [
-		OtpProcessor,
+		VerifyProcessor,
 		QueuesService,
 		AddCampaignMediaProcessor,
 		UploadUserMediaProcessor

@@ -13,12 +13,7 @@ import {
 	UseInterceptors
 } from '@nestjs/common'
 import { FilesInterceptor } from '@nestjs/platform-express'
-import {
-	ApiBearerAuth,
-	ApiConsumes,
-	ApiQuery,
-	ApiSecurity
-} from '@nestjs/swagger'
+import { ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
@@ -127,8 +122,6 @@ export class CampaignsController {
 	@ApiQuery({ name: 'page', default: 0, type: Number })
 	@ApiQuery({ name: 'limit', default: 10, type: Number })
 	@ApiBearerAuth()
-	@ApiSecurity('api-key')
-	@ApiSecurity('partner-code')
 	async getCampaignByCategory(
 		@Param('categoryId') id: string,
 		@Query('page') page: number = 0,
