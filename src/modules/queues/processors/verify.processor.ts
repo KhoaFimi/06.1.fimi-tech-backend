@@ -52,8 +52,6 @@ export class VerifyProcessor extends WorkerHost {
 	) {
 		const res = await this.verificationTokenService.generate(id)
 
-		console.log(partner)
-
 		await this.mailerService.sendMail({
 			subject: `[${partner.name}] - Xác thực tài khoản`,
 			text: `Link: ${this.config.frontendBaseUrl}/account/verification?token=${res.token}&key=${id}

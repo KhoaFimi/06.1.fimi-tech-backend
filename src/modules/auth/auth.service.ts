@@ -8,7 +8,7 @@ import {
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import * as argon2 from 'argon2'
 
-import { ErrorCode, SuccessCode } from '@/constraints/code.constraints'
+import { ErrorCode } from '@/constraints/code.constraints'
 import { SignInDto } from '@/modules/auth/dto/sign-in.dto'
 import { SignUpDto } from '@/modules/auth/dto/sign-up.dto'
 import { PartnersService } from '@/modules/partners/partners.service'
@@ -134,9 +134,17 @@ export class AuthService {
 	public async signIn(signInDto: SignInDto) {
 		const { email, password } = signInDto
 
-		const existingUser = await this.usersService.findOneByUnique({
-			email
-		})
+		const existingUser = await this.usersService.findOneByUnique(
+			{
+				email
+			},
+			{
+				include: {
+					partner: true
+				},
+				omit: {}
+			}
+		)
 
 		if (!existingUser)
 			throw new NotFoundException('Thông tin đăng nhập không chính xác', {
@@ -156,12 +164,13 @@ export class AuthService {
 				'send.verification',
 				new SendOtpDto({
 					id: existingUser.id,
-					email: existingUser.email
+					email: existingUser.email,
+					partner: existingUser.partner
 				})
 			)
 
 			throw new NotAcceptableException('Tài khoản chưa được xác thực', {
-				description: SuccessCode.NOT_VERIFIED,
+				description: ErrorCode.NOT_VERIFIED,
 				cause: {
 					data: {
 						verificationKey: existingUser.id
@@ -187,7 +196,10 @@ export class AuthService {
 
 		const res = await this.genTokenPair(existingUser.id, existingUser.roles)
 
-		return res
+		return {
+			user: existingUser,
+			...res
+		}
 	}
 
 	@OnEvent('logout')

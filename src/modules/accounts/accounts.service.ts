@@ -60,6 +60,11 @@ export class AccountsService {
 				description: ErrorCode.NOT_FOUND_ERROR
 			})
 
+		if (existingUser.emailVerified)
+			throw new ConflictException('Người dùng đã xác thực', {
+				description: ErrorCode.DUPLICATED_ERROR
+			})
+
 		this.eventEmiter.emit(
 			'send.verification',
 			new SendOtpDto({

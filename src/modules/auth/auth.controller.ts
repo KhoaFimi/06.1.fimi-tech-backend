@@ -9,6 +9,7 @@ import {
 	UseGuards
 } from '@nestjs/common'
 import { ApiBody, ApiHeader, ApiParam, ApiTags } from '@nestjs/swagger'
+import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
 import { ResponseBody } from '@/decorators/response-message.decorator'
@@ -16,6 +17,7 @@ import { AuthService } from '@/modules/auth/auth.service'
 import { SignInDto } from '@/modules/auth/dto/sign-in.dto'
 import { SignUpDto } from '@/modules/auth/dto/sign-up.dto'
 import { RefreshTokenGuard } from '@/modules/auth/guards/refresh-token.guard'
+import { User } from '@/modules/users/entities/user.entity'
 import { ExtendedRequest } from '@/types/api.type'
 
 @Controller('auth')
@@ -82,7 +84,11 @@ export class AuthController {
 	async signIn(@Body() body: SignInDto) {
 		const res = await this.authService.signIn(body)
 
-		return res
+		return {
+			user: plainToClass(User, res.user),
+			accessToken: res.accessToken,
+			refreshToken: res.refreshToken
+		}
 	}
 	// #endregion
 
