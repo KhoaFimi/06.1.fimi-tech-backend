@@ -1,18 +1,20 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq'
 import { Job } from 'bullmq'
-import { CloudinaryService } from 'nestjs-cloudinary'
 
 import { UPLOAD_USER_MEDIA_QUEUE_NAME } from '@/constants/queue.constant'
 import { AddIdentifierCardImageDto } from '@/modules/queues/dtos/add-identifier-card-image.dto'
 import { AddPotraitImageDto } from '@/modules/queues/dtos/add-potrait-image.dto'
 import { AddUserAvatarDto } from '@/modules/queues/dtos/add-user-media.dto'
 import { UsersService } from '@/modules/users/users.service'
+import { ApiConfigService } from '@/shared/services/api-config.service'
+import { FilesService } from '@/shared/services/files.service'
 
 @Processor(UPLOAD_USER_MEDIA_QUEUE_NAME)
 export class UploadUserMediaProcessor extends WorkerHost {
 	constructor(
-		private readonly cloudinaryService: CloudinaryService,
-		private readonly usersSerice: UsersService
+		private readonly usersService: UsersService,
+		private readonly filesService: FilesService,
+		private readonly apiConfig: ApiConfigService
 	) {
 		super()
 	}
@@ -52,91 +54,85 @@ export class UploadUserMediaProcessor extends WorkerHost {
 	private async uploadIdentifierCardImage(
 		params: Partial<AddIdentifierCardImageDto>
 	) {
-		const existingUser = await this.usersSerice.findOneById(params.id)
+		const existingUser = await this.usersService.findOneById(params.id)
 
 		if (!existingUser) return
 
 		const [uploadFrontRes, uploadBackRes] = await Promise.all([
-			this.cloudinaryService.uploadFile(
-				{
-					...params.front,
-					buffer: Buffer.from(params.front.buffer)
-				},
-				{ folder: `document/${existingUser.code}` }
-			),
-			this.cloudinaryService.uploadFile(
-				{
-					...params.back,
-					buffer: Buffer.from(params.back.buffer)
-				},
-				{ folder: `document/${existingUser.code}` }
-			)
+			this.filesService.uploadFile(params.front, {
+				fileName: `${existingUser.id}-front`,
+				folderId: this.apiConfig.driveDocuementsFolderId
+			}),
+			this.filesService.uploadFile(params.back, {
+				fileName: `${existingUser.id}-back`,
+				folderId: this.apiConfig.driveDocuementsFolderId
+			})
 		])
 
-		await this.usersSerice.update(params.id, {
+		await this.usersService.update(params.id, {
 			document: {
-				...existingUser.document,
-				imageFront: {
-					key: uploadFrontRes.public_id,
-					url: uploadFrontRes.secure_url
-				},
-				imageBack: {
-					key: uploadBackRes.public_id,
-					url: uploadBackRes.secure_url
+				set: {
+					...existingUser.document,
+					imageFront: {
+						key: uploadFrontRes.fileId,
+						url: uploadFrontRes.fileUrl
+					},
+					imageBack: {
+						key: uploadBackRes.fileId,
+						url: uploadBackRes.fileUrl
+					}
 				}
 			}
 		})
 	}
 
 	private async uploadPotraitImage(params: Partial<AddPotraitImageDto>) {
-		const existingUser = await this.usersSerice.findOneById(params.id)
+		const existingUser = await this.usersService.findOneById(params.id)
 
 		if (!existingUser) return
 
-		const uploadPotraitRes = await this.cloudinaryService.uploadFile(
+		const uploadPotraitRes = await this.filesService.uploadFile(
+			params.potrait,
 			{
-				...params.potrait,
-				buffer: Buffer.from(params.potrait.buffer)
-			},
-			{
-				folder: `document/${existingUser.code}`
+				fileName: `${existingUser.id}-potrait`,
+				folderId: this.apiConfig.driveDocuementsFolderId
 			}
 		)
 
-		await this.usersSerice.update(params.id, {
+		await this.usersService.update(params.id, {
 			document: {
-				...existingUser.document,
-				potrait: {
-					key: uploadPotraitRes.public_id,
-					url: uploadPotraitRes.secure_url
+				set: {
+					...existingUser.document,
+					potrait: {
+						key: uploadPotraitRes.fileId,
+						url: uploadPotraitRes.fileUrl
+					}
 				}
 			}
 		})
 	}
 
 	private async uploadAvatar(params: Partial<AddUserAvatarDto>) {
-		const existingUser = await this.usersSerice.findOneById(params.id)
+		const existingUser = await this.usersService.findOneById(params.id)
 
-		if (existingUser.profile.avatar) {
-			await this.cloudinaryService.cloudinary.uploader.destroy(
-				existingUser.profile.avatar.key
-			)
+		if (existingUser.profile && existingUser.profile.avatar) {
+			await this.filesService.deleteFile(existingUser.profile.avatar.key)
 		}
 
-		const uploadRes = await this.cloudinaryService.uploadFile(
-			{
-				...params.avatar,
-				buffer: Buffer.from(params.avatar.buffer)
-			},
-			{ folder: 'avatar' }
-		)
+		const uploadRes = await this.filesService.uploadFile(params.avatar, {
+			fileName: `${existingUser.id}-avatar`,
+			folderId: this.apiConfig.driveAvatarFolderId
+		})
 
-		await this.usersSerice.update(params.id, {
+		await this.usersService.update(params.id, {
 			profile: {
-				avatar: {
+				// ...existingUser.profile,
+				set: {
 					...existingUser.profile,
-					key: uploadRes.public_id,
-					url: uploadRes.secure_url
+					avatar: {
+						key: uploadRes.fileId,
+						url: uploadRes.fileUrl
+					}
 				}
 			}
 		})

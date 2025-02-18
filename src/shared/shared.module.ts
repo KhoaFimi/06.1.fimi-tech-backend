@@ -3,10 +3,10 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { google } from 'googleapis'
-import { CloudinaryModule } from 'nestjs-cloudinary'
 
 import { ApiConfigService } from '@/shared/services/api-config.service'
 import { ApiDocsService } from '@/shared/services/api-docs.service'
+import { FilesService } from '@/shared/services/files.service'
 import { LoggerService } from '@/shared/services/logger.service'
 import { PrismaService } from '@/shared/services/prisma.service'
 
@@ -67,24 +67,22 @@ import { PrismaService } from '@/shared/services/prisma.service'
 					}
 				}
 			}
-		}),
-		CloudinaryModule.forRootAsync({
-			imports: [SharedModule],
-			inject: [ApiConfigService],
-			useFactory: (apiConfig: ApiConfigService) => ({
-				api_key: apiConfig.cloudinaryApiKey,
-				api_secret: apiConfig.cloudinaryApiSecret,
-				cloud_name: apiConfig.cloudinaryCloudName
-			})
 		})
 	],
 	providers: [
 		ApiConfigService,
 		LoggerService,
 		PrismaService,
-		ApiDocsService
+		ApiDocsService,
+		FilesService
 		// MailerConfigService
 	],
-	exports: [LoggerService, ApiConfigService, PrismaService, ApiDocsService]
+	exports: [
+		LoggerService,
+		ApiConfigService,
+		PrismaService,
+		ApiDocsService,
+		FilesService
+	]
 })
 export class SharedModule {}

@@ -144,17 +144,14 @@ export class AccountsService {
 		const res = await this.usersService.update(existingUser.id, {
 			...updateUserDto,
 			profile: {
-				...existingUser.profile,
-				...updateUserDto.profile,
-				bank: {
-					...existingUser.profile.bank,
-					...updateUserDto.profile.bank,
-					accountName: updateUserDto.profile.bank.accountName.toUpperCase()
+				set: {
+					...updateUserDto.profile
 				}
 			},
 			document: {
-				...existingUser.document,
-				...updateUserDto.document
+				set: {
+					...updateUserDto.document
+				}
 			}
 		})
 

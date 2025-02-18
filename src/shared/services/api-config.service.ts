@@ -111,8 +111,26 @@ export class ApiConfigService {
 		return this.getString('GOOGLE_REFRESH_TOKEN')
 	}
 
+	get googleRedirectUrl(): string {
+		return this.getString('GOOGLE_REDIRECT_URL')
+	}
+
 	get adminEmailAddress(): string {
 		return this.getString('ADMIN_EMAIL_ADDRESS')
+	}
+	// #endregion
+
+	// #region: Drive
+	get driveAvatarFolderId(): string {
+		return this.getString('DRIVE_AVATAR_FOLDER_ID')
+	}
+
+	get driveDocuementsFolderId(): string {
+		return this.getString('DRIVE_DOCUMENTS_FOLDER_ID')
+	}
+
+	get driveCampaignAssetsFolderId(): string {
+		return this.getString('DRIVE_CAMPAIGN_ASSETS_FOLDER_ID')
 	}
 	// #endregion
 

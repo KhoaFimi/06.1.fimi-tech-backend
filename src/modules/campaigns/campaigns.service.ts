@@ -85,9 +85,7 @@ export class CampaignsService {
 	public async update(id: string, data: UpdateCampaignDto) {
 		return await this.db.campaign.update({
 			where: { id },
-			data: {
-				...data
-			}
+			data
 		})
 	}
 	// #endregion

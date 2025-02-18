@@ -66,9 +66,7 @@ export class UsersService {
 	async update(id: string, updateUserDto: UpdateUserDto) {
 		return await this.db.user.update({
 			where: { id },
-			data: {
-				...updateUserDto
-			}
+			data: updateUserDto
 		})
 	}
 

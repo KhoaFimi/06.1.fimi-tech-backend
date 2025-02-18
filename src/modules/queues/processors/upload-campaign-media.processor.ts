@@ -1,15 +1,17 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq'
 import { Job } from 'bullmq'
-import { CloudinaryService } from 'nestjs-cloudinary'
 
 import { ADD_CAMPAIGN_MEDIA_QUEUE_NAME } from '@/constants/queue.constant'
 import { CampaignsService } from '@/modules/campaigns/campaigns.service'
+import { ApiConfigService } from '@/shared/services/api-config.service'
+import { FilesService } from '@/shared/services/files.service'
 
 @Processor(ADD_CAMPAIGN_MEDIA_QUEUE_NAME)
 export class AddCampaignMediaProcessor extends WorkerHost {
 	constructor(
-		private readonly cloudinaryService: CloudinaryService,
-		private readonly campaignService: CampaignsService
+		private readonly campaignService: CampaignsService,
+		private readonly apiConfigService: ApiConfigService,
+		private readonly filesService: FilesService
 	) {
 		super()
 	}
@@ -20,8 +22,7 @@ export class AddCampaignMediaProcessor extends WorkerHost {
 				await this.uploadCampaignImages(
 					job.data.id,
 					job.data.images,
-					job.data.video,
-					'campaign-image'
+					job.data.video
 				)
 				break
 			default:
@@ -32,8 +33,7 @@ export class AddCampaignMediaProcessor extends WorkerHost {
 	private async uploadCampaignImages(
 		id: string,
 		files: Express.Multer.File[],
-		video: string,
-		folder: string = 'public'
+		video: string
 	) {
 		const images: {
 			key: string
@@ -41,19 +41,14 @@ export class AddCampaignMediaProcessor extends WorkerHost {
 		}[] = []
 
 		for (const file of files) {
-			const res = await this.cloudinaryService.uploadFile(
-				{
-					...file,
-					buffer: Buffer.from(file.buffer)
-				},
-				{
-					folder
-				}
-			)
+			const res = await this.filesService.uploadFile(file, {
+				fileName: file.originalname,
+				folderId: this.apiConfigService.driveCampaignAssetsFolderId
+			})
 
 			images.push({
-				key: res.public_id,
-				url: res.secure_url
+				key: res.fileId,
+				url: res.fileUrl
 			})
 		}
 
