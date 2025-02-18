@@ -65,7 +65,7 @@ export class FilesService {
 			fields: 'webViewLink, webContentLink'
 		})
 
-		const fileUrl = result.data.webViewLink
+		const fileUrl = result.data.webContentLink
 
 		return fileUrl
 	}
