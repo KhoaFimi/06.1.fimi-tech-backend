@@ -23,6 +23,11 @@ export class UploadUserMediaProcessor extends WorkerHost {
 	onQueueFailed(job: Job, err: any) {
 		console.log(`Job has been failed: ${job.id}`)
 		console.log({ err })
+
+		return {
+			jobId: job.id,
+			isCompleted: false
+		}
 	}
 
 	async process(job: Job<any, any, string>, _token?: string): Promise<any> {
@@ -30,6 +35,7 @@ export class UploadUserMediaProcessor extends WorkerHost {
 			case 'upload-avatar':
 				await this.uploadAvatar({
 					id: job.data.id,
+					fileId: job.data.fileId,
 					avatar: job.data.avatar
 				})
 				break
@@ -136,5 +142,9 @@ export class UploadUserMediaProcessor extends WorkerHost {
 				}
 			}
 		})
+
+		return {
+			newAvatar: uploadRes.fileUrl
+		}
 	}
 }

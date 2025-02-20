@@ -1,12 +1,17 @@
+import { InjectQueue } from '@nestjs/bullmq'
 import {
 	BadRequestException,
 	ConflictException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
 import * as argon2 from 'argon2'
+import { Queue } from 'bullmq'
 
+import {
+	OTP_QUEUE_NAME,
+	UPLOAD_USER_MEDIA_QUEUE_NAME
+} from '@/constants/queue.constant'
 import { ErrorCode } from '@/constraints/code.constraints'
 import {
 	ChangeEmaiDto,
@@ -18,14 +23,13 @@ import { ForgotPasswordDto } from '@/modules/accounts/dtos/forgot-password.dto'
 import { NewVerificationDto } from '@/modules/accounts/dtos/new-verification.dto'
 import { ResetPasswordDto } from '@/modules/accounts/dtos/reset-password.dto'
 import { UpdateUserInfoDto } from '@/modules/accounts/dtos/update-user-info.dto'
-import { AddIdentifierCardImageDto } from '@/modules/queues/dtos/add-identifier-card-image.dto'
-import { AddPotraitImageDto } from '@/modules/queues/dtos/add-potrait-image.dto'
-import { AddUserAvatarDto } from '@/modules/queues/dtos/add-user-media.dto'
-import { SendOtpDto } from '@/modules/queues/dtos/send-otp.dto'
+import { AuthService } from '@/modules/auth/auth.service'
 import { ChangeEmailTokenService } from '@/modules/tokens/services/change-email-token.service'
 import { ResetPasswordTokenService } from '@/modules/tokens/services/reset-password-token.service'
 import { VerificationTokenService } from '@/modules/tokens/services/verification-token.service'
 import { UsersService } from '@/modules/users/users.service'
+import { ApiConfigService } from '@/shared/services/api-config.service'
+import { FilesService } from '@/shared/services/files.service'
 
 @Injectable()
 export class AccountsService {
@@ -34,7 +38,13 @@ export class AccountsService {
 		private readonly verificationTokenService: VerificationTokenService,
 		private readonly resetPasswordTokenService: ResetPasswordTokenService,
 		private readonly changeEmailTokenService: ChangeEmailTokenService,
-		private readonly eventEmiter: EventEmitter2
+		private readonly authService: AuthService,
+		private readonly apiConfig: ApiConfigService,
+		private readonly filesService: FilesService,
+		@InjectQueue(UPLOAD_USER_MEDIA_QUEUE_NAME)
+		private readonly uploadUserMediaQueue: Queue,
+		@InjectQueue(OTP_QUEUE_NAME)
+		private readonly otpQueue: Queue
 	) {}
 
 	public async newVerification(newVerificationDto: NewVerificationDto) {
@@ -65,13 +75,16 @@ export class AccountsService {
 				description: ErrorCode.DUPLICATED_ERROR
 			})
 
-		this.eventEmiter.emit(
-			'send.verification',
-			new SendOtpDto({
+		await this.otpQueue.add(
+			'verification',
+			{
 				id: existingUser.id,
-				email: existingUser.email
-			})
+				email: existingUser.email,
+				partner: existingUser.partner
+			},
+			{ removeOnComplete: true }
 		)
+
 		return {
 			verificationKey: existingUser.id
 		}
@@ -95,13 +108,14 @@ export class AccountsService {
 				description: ErrorCode.WRONG_CREDENTIALS_ERROR
 			})
 
-		this.eventEmiter.emit(
-			'send.reset-password',
-			new SendOtpDto({
+		await this.otpQueue.add(
+			'reset-password',
+			{
 				id: existingUser.id,
 				email: existingUser.email,
 				partner: existingUser.partner
-			})
+			},
+			{ removeOnComplete: true }
 		)
 
 		return {
@@ -185,7 +199,7 @@ export class AccountsService {
 			password: hashedNewPassword
 		})
 
-		this.eventEmiter.emit('logout', id)
+		await this.authService.signOut(existingUser.id)
 	}
 
 	async changePhone(id: string, changePhoneDto: ChangeUserPhoneDto) {
@@ -251,12 +265,13 @@ export class AccountsService {
 				}
 			})
 
-		this.eventEmiter.emit(
-			'send.change-email',
-			new SendOtpDto({
+		await this.otpQueue.add(
+			'change-email',
+			{
 				id: existingUser.id,
-				email: requestChangeEmailDto.newEmail
-			})
+				email: existingUser.email
+			},
+			{ removeOnComplete: true }
 		)
 
 		return {
@@ -283,13 +298,27 @@ export class AccountsService {
 	async changeAvatar(id: string, avatar: Express.Multer.File) {
 		const existingUser = await this.checkExistingUser(id)
 
-		await this.eventEmiter.emit(
-			'add.user-avatar',
-			new AddUserAvatarDto({
-				id: existingUser.id,
-				avatar: avatar
-			})
-		)
+		const uploadRes = await this.filesService.uploadFile(avatar, {
+			fileName: `${existingUser.id}-avatar`,
+			folderId: this.apiConfig.driveAvatarFolderId
+		})
+
+		await this.usersService.update(existingUser.id, {
+			profile: {
+				// ...existingUser.profile,
+				set: {
+					...existingUser.profile,
+					avatar: {
+						key: uploadRes.fileId,
+						url: uploadRes.fileUrl
+					}
+				}
+			}
+		})
+
+		return {
+			url: uploadRes.fileUrl
+		}
 	}
 
 	async addIdentifierCardImage(
@@ -297,26 +326,61 @@ export class AccountsService {
 		files: { front?: Express.Multer.File[]; back?: Express.Multer.File[] }
 	) {
 		const existingUser = await this.checkExistingUser(id)
-
-		await this.eventEmiter.emit(
-			'add.user-identifier-image',
-			new AddIdentifierCardImageDto({
-				id: existingUser.id,
-				front: files.front[0],
-				back: files.back[0]
+		const [uploadFrontRes, uploadBackRes] = await Promise.all([
+			this.filesService.uploadFile(files.front[0], {
+				fileName: `${existingUser.id}-front`,
+				folderId: this.apiConfig.driveDocuementsFolderId
+			}),
+			this.filesService.uploadFile(files.back[0], {
+				fileName: `${existingUser.id}-back`,
+				folderId: this.apiConfig.driveDocuementsFolderId
 			})
-		)
+		])
+
+		await this.usersService.update(existingUser.id, {
+			document: {
+				set: {
+					...existingUser.document,
+					imageFront: {
+						key: uploadFrontRes.fileId,
+						url: uploadFrontRes.fileUrl
+					},
+					imageBack: {
+						key: uploadBackRes.fileId,
+						url: uploadBackRes.fileUrl
+					}
+				}
+			}
+		})
+
+		return {
+			frontUrl: uploadFrontRes.fileUrl,
+			backUrl: uploadBackRes.fileUrl
+		}
 	}
 
 	async addPotraitImage(id: string, potrait: Express.Multer.File) {
 		const existingUser = await this.checkExistingUser(id)
 
-		await this.eventEmiter.emit(
-			'add.user-potrait',
-			new AddPotraitImageDto({
-				id: existingUser.id,
-				potrait
-			})
-		)
+		const uploadPotraitRes = await this.filesService.uploadFile(potrait, {
+			fileName: `${existingUser.id}-potrait`,
+			folderId: this.apiConfig.driveDocuementsFolderId
+		})
+
+		await this.usersService.update(existingUser.id, {
+			document: {
+				set: {
+					...existingUser.document,
+					potrait: {
+						key: uploadPotraitRes.fileId,
+						url: uploadPotraitRes.fileUrl
+					}
+				}
+			}
+		})
+
+		return {
+			url: uploadPotraitRes.fileUrl
+		}
 	}
 }

@@ -226,7 +226,9 @@ export class AccountsController {
 		@Param('id') id: string,
 		@UploadedFile() avatar: Express.Multer.File
 	) {
-		await this.accountsService.changeAvatar(id, avatar)
+		const res = await this.accountsService.changeAvatar(id, avatar)
+
+		return res
 	}
 	// #endregion
 
@@ -266,7 +268,9 @@ export class AccountsController {
 		@UploadedFiles(new IdentifierCardImageFilter())
 		files: { front?: Express.Multer.File[]; back?: Express.Multer.File[] }
 	) {
-		await this.accountsService.addIdentifierCardImage(id, files)
+		const res = await this.accountsService.addIdentifierCardImage(id, files)
+
+		return res
 	}
 	// #endregion
 
@@ -297,7 +301,9 @@ export class AccountsController {
 		@UploadedFile(new PotraitFilter())
 		potrait: Express.Multer.File
 	) {
-		await this.accountsService.addPotraitImage(id, potrait)
+		const res = await this.accountsService.addPotraitImage(id, potrait)
+
+		return res
 	}
 	// #endregion
 }

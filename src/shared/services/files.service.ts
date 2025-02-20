@@ -41,6 +41,8 @@ export class FilesService {
 				fileUrl: await this.getFileUrl(fileId)
 			}
 		} catch (_error) {
+			console.log(_error)
+
 			throw new BadRequestException('Uplooad file không thành công', {
 				description: ErrorCode.WRONG_CREDENTIALS_ERROR
 			})
