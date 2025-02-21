@@ -9,6 +9,50 @@ import { ApiConfigService } from '@/shared/services/api-config.service'
 export class FilesService {
 	constructor(private readonly apiConfig: ApiConfigService) {}
 
+	// #region: Update file
+	async updateFile(
+		file: Express.Multer.File,
+		{
+			fileName,
+			fileId
+		}: { folderId?: string; fileName?: string; fileId?: string }
+	) {
+		try {
+			const driveService = this.getDriveService()
+
+			const bufferStream = new stream.PassThrough()
+
+			bufferStream.end(Buffer.from(file.buffer))
+
+			const response = await driveService.files.update({
+				fileId,
+				requestBody: {
+					name: fileName ?? file.originalname,
+					mimeType: file.mimetype
+				},
+				media: {
+					body: bufferStream,
+					mimeType: file.mimetype
+				},
+				fields: 'id'
+			})
+
+			const { id: newFileId } = response.data
+
+			return {
+				fileId,
+				fileUrl: await this.getFileUrl(newFileId)
+			}
+		} catch (_error) {
+			console.log(_error)
+
+			throw new BadRequestException('Update file không thành công', {
+				description: ErrorCode.WRONG_CREDENTIALS_ERROR
+			})
+		}
+	}
+	// #endregion
+
 	// #region: Upload file
 	async uploadFile(
 		file: Express.Multer.File,

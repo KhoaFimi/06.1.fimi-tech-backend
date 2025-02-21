@@ -296,91 +296,42 @@ export class AccountsService {
 	}
 
 	async changeAvatar(id: string, avatar: Express.Multer.File) {
-		const existingUser = await this.checkExistingUser(id)
-
-		const uploadRes = await this.filesService.uploadFile(avatar, {
-			fileName: `${existingUser.id}-avatar`,
-			folderId: this.apiConfig.driveAvatarFolderId
-		})
-
-		await this.usersService.update(existingUser.id, {
-			profile: {
-				// ...existingUser.profile,
-				set: {
-					...existingUser.profile,
-					avatar: {
-						key: uploadRes.fileId,
-						url: uploadRes.fileUrl
-					}
-				}
-			}
-		})
-
-		return {
-			url: uploadRes.fileUrl
-		}
+		await this.uploadUserMediaQueue.add(
+			'upload-avatar',
+			{
+				id,
+				avatar
+			},
+			{ removeOnComplete: 1000, removeOnFail: 1000 }
+		)
 	}
 
 	async addIdentifierCardImage(
 		id: string,
 		files: { front?: Express.Multer.File[]; back?: Express.Multer.File[] }
 	) {
-		const existingUser = await this.checkExistingUser(id)
-		const [uploadFrontRes, uploadBackRes] = await Promise.all([
-			this.filesService.uploadFile(files.front[0], {
-				fileName: `${existingUser.id}-front`,
-				folderId: this.apiConfig.driveDocuementsFolderId
-			}),
-			this.filesService.uploadFile(files.back[0], {
-				fileName: `${existingUser.id}-back`,
-				folderId: this.apiConfig.driveDocuementsFolderId
-			})
-		])
-
-		await this.usersService.update(existingUser.id, {
-			document: {
-				set: {
-					...existingUser.document,
-					imageFront: {
-						key: uploadFrontRes.fileId,
-						url: uploadFrontRes.fileUrl
-					},
-					imageBack: {
-						key: uploadBackRes.fileId,
-						url: uploadBackRes.fileUrl
-					}
-				}
-			}
-		})
-
-		return {
-			frontUrl: uploadFrontRes.fileUrl,
-			backUrl: uploadBackRes.fileUrl
-		}
+		await this.uploadUserMediaQueue.add(
+			'upload-identifier-card-image',
+			{
+				id,
+				front: files.front[0],
+				back: files.back[0]
+			},
+			{ removeOnComplete: 1000, removeOnFail: 1000 }
+		)
 	}
 
 	async addPotraitImage(id: string, potrait: Express.Multer.File) {
-		const existingUser = await this.checkExistingUser(id)
-
-		const uploadPotraitRes = await this.filesService.uploadFile(potrait, {
-			fileName: `${existingUser.id}-potrait`,
-			folderId: this.apiConfig.driveDocuementsFolderId
-		})
-
-		await this.usersService.update(existingUser.id, {
-			document: {
-				set: {
-					...existingUser.document,
-					potrait: {
-						key: uploadPotraitRes.fileId,
-						url: uploadPotraitRes.fileUrl
-					}
-				}
+		await this.uploadUserMediaQueue.add(
+			'upload-potrait',
+			{
+				id,
+				potrait
+			},
+			{
+				removeOnComplete: 1000,
+				removeOnFail: 1000
 			}
-		})
-
-		return {
-			url: uploadPotraitRes.fileUrl
-		}
+		)
 	}
 }
