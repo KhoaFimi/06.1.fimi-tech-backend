@@ -4,7 +4,6 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { JwtService, TokenExpiredError } from '@nestjs/jwt'
-import * as argon2 from 'argon2'
 
 import { ErrorCode } from '@/constraints/code.constraints'
 import {
@@ -38,10 +37,8 @@ export class RefreshTokenService {
 	}
 
 	private async storeRefreshToken(id: string, token: string) {
-		const hashedToken = await argon2.hash(token)
-
 		await this.usersService.update(id, {
-			refreshToken: hashedToken
+			refreshToken: token
 		})
 	}
 
@@ -71,16 +68,6 @@ export class RefreshTokenService {
 
 			if (!existingUser)
 				throw new NotFoundException('Refresh Token không chính xác', {
-					description: ErrorCode.WRONG_CREDENTIALS_ERROR
-				})
-
-			const verifyRefreshToken = await argon2.verify(
-				existingUser.refreshToken,
-				token
-			)
-
-			if (!verifyRefreshToken)
-				throw new UnauthorizedException('Refresh Token không chính xác', {
 					description: ErrorCode.WRONG_CREDENTIALS_ERROR
 				})
 
