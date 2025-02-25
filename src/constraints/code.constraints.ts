@@ -12,6 +12,7 @@ export enum ErrorCode {
 	OTP_EXPIRES_ERROR = 'E4004', // Otp is expires
 	NO_TNC_ERROR = 'E4005', // No TNC
 	ACCESS_TOKEN_EXPIRED_ERROR = 'E4011', // Access token is expired
+	REFRESH_TOKEN_EXPIRED_ERROR = 'E4012', // Refresh token is expired
 	UNAUTHORIZED_ERROR = 'E4000', // Unauthorize error
 	NOT_FOUND_ERROR = 'E4040', // Not found error
 	WRONG_CREDENTIALS_ERROR = 'E4041', // Credentials is wrong

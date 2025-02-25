@@ -75,7 +75,7 @@ export class RefreshTokenService {
 		} catch (error) {
 			if (error instanceof TokenExpiredError) {
 				throw new UnauthorizedException('Refresh token hết hạn', {
-					description: ErrorCode.ACCESS_TOKEN_EXPIRED_ERROR
+					description: ErrorCode.REFRESH_TOKEN_EXPIRED_ERROR
 				})
 			}
 

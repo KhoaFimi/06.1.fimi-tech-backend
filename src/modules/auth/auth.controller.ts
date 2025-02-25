@@ -8,7 +8,7 @@ import {
 	Req,
 	UseGuards
 } from '@nestjs/common'
-import { ApiBody, ApiHeader, ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger'
 import { plainToClass } from 'class-transformer'
 
 import { SuccessCode } from '@/constraints/code.constraints'
@@ -116,10 +116,7 @@ export class AuthController {
 		statusCode: SuccessCode.OK,
 		message: 'Lấy token mới thành công'
 	})
-	@ApiHeader({
-		name: 'X-REFRESH-TOKEN',
-		required: true
-	})
+	@ApiBearerAuth()
 	async refreshToken(@Req() requuest: ExtendedRequest) {
 		const user = requuest.user
 
