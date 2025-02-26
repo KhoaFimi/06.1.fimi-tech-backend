@@ -28,8 +28,6 @@ import { ChangeEmailTokenService } from '@/modules/tokens/services/change-email-
 import { ResetPasswordTokenService } from '@/modules/tokens/services/reset-password-token.service'
 import { VerificationTokenService } from '@/modules/tokens/services/verification-token.service'
 import { UsersService } from '@/modules/users/users.service'
-import { ApiConfigService } from '@/shared/services/api-config.service'
-import { FilesService } from '@/shared/services/files.service'
 
 @Injectable()
 export class AccountsService {
@@ -39,8 +37,6 @@ export class AccountsService {
 		private readonly resetPasswordTokenService: ResetPasswordTokenService,
 		private readonly changeEmailTokenService: ChangeEmailTokenService,
 		private readonly authService: AuthService,
-		private readonly apiConfig: ApiConfigService,
-		private readonly filesService: FilesService,
 		@InjectQueue(UPLOAD_USER_MEDIA_QUEUE_NAME)
 		private readonly uploadUserMediaQueue: Queue,
 		@InjectQueue(OTP_QUEUE_NAME)
@@ -54,6 +50,10 @@ export class AccountsService {
 			token,
 			verificationKey
 		)
+
+		if (res.isVerified) {
+			return
+		}
 
 		await this.usersService.update(res.identifier, {
 			emailVerified: new Date()

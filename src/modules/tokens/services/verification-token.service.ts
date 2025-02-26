@@ -8,6 +8,7 @@ import {
 import * as argon2 from 'argon2'
 
 import { ErrorCode } from '@/constraints/code.constraints'
+import { UsersService } from '@/modules/users/users.service'
 import { ApiConfigService } from '@/shared/services/api-config.service'
 import { PrismaService } from '@/shared/services/prisma.service'
 
@@ -15,7 +16,8 @@ import { PrismaService } from '@/shared/services/prisma.service'
 export class VerificationTokenService {
 	constructor(
 		private readonly db: PrismaService,
-		private readonly apiConfig: ApiConfigService
+		private readonly apiConfig: ApiConfigService,
+		private readonly usersService: UsersService
 	) {}
 
 	async generate(identifier: string) {
@@ -54,6 +56,15 @@ export class VerificationTokenService {
 		const existingToken = await this.db.verificationToken.findFirst({
 			where: { identifier }
 		})
+
+		const existingUser = await this.usersService.findOneById(identifier)
+
+		if (existingUser.emailVerified) {
+			return {
+				isVerified: true,
+				identifier
+			}
+		}
 
 		if (!existingToken)
 			throw new NotFoundException('Verification key không chính xác', {
