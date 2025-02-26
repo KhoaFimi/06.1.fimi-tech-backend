@@ -50,18 +50,18 @@ export class AccountsController {
 	constructor(private readonly accountsService: AccountsService) {}
 
 	// #region: new verification
-	@Post('new-verification')
+	@Post('email-verification')
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Xác thực thành công'
 	})
-	async newVerification(@Body() body: NewVerificationDto) {
+	async emailVerification(@Body() body: NewVerificationDto) {
 		await this.accountsService.newVerification(body)
 	}
 	// #endregion
 
 	// #region: get new otp
-	@Get('/new-otp/:key')
+	@Get('/new-email-verification-session/:key')
 	@ResponseBody({
 		statusCode: SuccessCode.OK,
 		message: 'Lấy OTP mới thành công'
@@ -71,7 +71,8 @@ export class AccountsController {
 		required: true
 	})
 	async newOtp(@Param('key') verificationKey: string) {
-		const res = await this.accountsService.getNewVerifySession(verificationKey)
+		const res =
+			await this.accountsService.getNewEmailVerifySession(verificationKey)
 
 		return res
 	}

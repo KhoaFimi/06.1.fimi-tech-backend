@@ -60,7 +60,7 @@ export class AccountsService {
 		})
 	}
 
-	public async getNewVerifySession(verificationKey: string) {
+	public async getNewEmailVerifySession(verificationKey: string) {
 		const existingUser = await this.usersService.findOneByUnique({
 			id: verificationKey
 		})
@@ -71,9 +71,9 @@ export class AccountsService {
 			})
 
 		if (existingUser.emailVerified)
-			throw new ConflictException('Người dùng đã xác thực', {
-				description: ErrorCode.DUPLICATED_ERROR
-			})
+			return {
+				isVerified: true
+			}
 
 		await this.otpQueue.add(
 			'verification',
